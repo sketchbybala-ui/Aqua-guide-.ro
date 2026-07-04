@@ -75,6 +75,26 @@ add it:
 3. Save. This template is used for both magic links and OTP codes, so this
    is a one-time change — no further configuration needed.
 
+### Enable "Continue with Google"
+
+The login and signup pages both have a Google button already wired up in
+the code — you just need to create Google OAuth credentials and add them
+to Supabase (no code or `.env` changes needed):
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/apis/credentials),
+   create a project if you don't have one.
+2. Configure the **OAuth consent screen** (External, add your app name/email).
+3. Create an **OAuth client ID** (Application type: **Web application**).
+4. Add this **Authorized redirect URI** (get the exact value from Supabase
+   Dashboard -> Authentication -> Sign In / Providers -> Google — it looks
+   like `https://<project-ref>.supabase.co/auth/v1/callback`).
+5. Copy the generated **Client ID** and **Client Secret**.
+6. In Supabase Dashboard -> Authentication -> Sign In / Providers -> **Google**,
+   toggle it on and paste in the Client ID and Client Secret. Save.
+
+That's it — the "Continue with Google" button on `/login` and `/signup`
+will work once this is saved.
+
 ## 5. Fill in your `.env.local`
 
 ```bash

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { GoogleSignInButton } from "./GoogleSignInButton";
 
 type Step = "credentials" | "otp";
 
@@ -153,6 +154,14 @@ export function LoginForm() {
       <Button type="submit" disabled={loading} className="mt-2 w-full">
         {loading ? "Sending code…" : "Continue"}
       </Button>
+
+      <div className="flex items-center gap-3 text-xs text-slate-400">
+        <div className="h-px flex-1 bg-slate-200" />
+        OR
+        <div className="h-px flex-1 bg-slate-200" />
+      </div>
+
+      <GoogleSignInButton />
 
       <p className="text-center text-sm text-slate-500">
         Don&apos;t have an account?{" "}

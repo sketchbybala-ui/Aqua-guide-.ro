@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 // Handles the redirect from Supabase Auth email links (signup confirmation,
-// magic link, password reset) and exchanges the code for a session cookie.
+// magic link, password reset) and OAuth providers (e.g. Google) — all of
+// these use the same code-exchange flow to create a session cookie.
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
