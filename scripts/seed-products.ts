@@ -2,11 +2,17 @@
  * One-off seed script: uploads the source catalog images from image/ to the
  * `product-images` Supabase Storage bucket, then upserts all 22 products.
  *
+ * The two Home Use "poster" images each contain several products side by
+ * side, so each product's individual tile is cropped out (coordinates
+ * calibrated by hand against the exact source files) rather than reusing
+ * the whole poster as every product's photo.
+ *
  * Run after creating your Supabase project and running supabase/schema.sql:
  *   npx tsx --env-file=.env.local scripts/seed-products.ts
  */
 import { readFile } from "fs/promises";
 import path from "path";
+import sharp from "sharp";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -34,6 +40,38 @@ async function uploadImage(localPath: string, storagePath: string) {
   return supabase.storage.from(BUCKET).getPublicUrl(storagePath).data.publicUrl;
 }
 
+type Box = { left: number; top: number; width: number; height: number };
+
+async function uploadCrop(localPath: string, box: Box, storagePath: string) {
+  const buffer = await sharp(path.join(IMAGE_ROOT, localPath))
+    .extract(box)
+    .jpeg({ quality: 90 })
+    .toBuffer();
+
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(storagePath, buffer, { contentType: "image/jpeg", upsert: true });
+
+  if (error) throw new Error(`Upload failed for ${storagePath}: ${error.message}`);
+
+  return supabase.storage.from(BUCKET).getPublicUrl(storagePath).data.publicUrl;
+}
+
+// Poster A: "house ro/WhatsApp Image 2026-07-02 at 3.47.12 PM.jpeg", 1536x1024,
+// a 6-column row of 6 products followed by a row of 5.
+const POSTER_A = "house ro/WhatsApp Image 2026-07-02 at 3.47.12 PM.jpeg";
+const posterARow1 = (col: number): Box => ({ left: col * 256, top: 140, width: 256, height: 350 });
+const posterARow2 = (col: number): Box => ({ left: col * 288, top: 490, width: 256, height: 420 });
+
+// Poster B: "house ro/catlog2.jpeg", 768x1376, a 2-column x 3-row grid.
+const POSTER_B = "house ro/catlog2.jpeg";
+const posterBCell = (col: number, row: number): Box => ({
+  left: col * 384,
+  top: row === 2 ? 918 : row * 459,
+  width: 384,
+  height: row === 2 ? 458 : 459,
+});
+
 type SeedProduct = {
   slug: string;
   name: string;
@@ -52,15 +90,27 @@ async function main() {
     throw bucketError;
   }
 
-  console.log("Uploading shared placeholder images...");
-  const homeUsePosterA = await uploadImage(
-    "house ro/WhatsApp Image 2026-07-02 at 3.47.12 PM.jpeg",
-    "placeholders/home-use-poster-a.jpg"
-  );
-  const homeUsePosterB = await uploadImage(
-    "house ro/catlog2.jpeg",
-    "placeholders/home-use-poster-b.jpg"
-  );
+  console.log("Cropping and uploading individual Home Use product photos...");
+  const homeUse = {
+    lexpureVedic: await uploadCrop(POSTER_A, posterARow1(0), "products/home-use/lexpure-vedic.jpg"),
+    vistaPro: await uploadCrop(POSTER_A, posterARow1(1), "products/home-use/vista-pro.jpg"),
+    roBlue: await uploadCrop(POSTER_A, posterARow1(2), "products/home-use/3-stage-ro-system-blue.jpg"),
+    roWhite: await uploadCrop(POSTER_A, posterARow1(3), "products/home-use/3-stage-ro-system-white.jpg"),
+    aquaGlory: await uploadCrop(POSTER_A, posterARow1(4), "products/home-use/aqua-glory.jpg"),
+    aquaCyclone: await uploadCrop(POSTER_A, posterARow1(5), "products/home-use/aqua-cyclone.jpg"),
+    aquagrand: await uploadCrop(POSTER_A, posterARow2(0), "products/home-use/aquagrand-ro-uv.jpg"),
+    aquaTouch: await uploadCrop(POSTER_A, posterARow2(1), "products/home-use/aqua-touch.jpg"),
+    aquaRoma: await uploadCrop(POSTER_A, posterARow2(2), "products/home-use/aqua-roma.jpg"),
+    neptune: await uploadCrop(POSTER_A, posterARow2(3), "products/home-use/neptune-aps.jpg"),
+    aquaInnovica: await uploadCrop(POSTER_A, posterARow2(4), "products/home-use/aqua-innovica.jpg"),
+
+    nileInnovicaLavish: await uploadCrop(POSTER_B, posterBCell(0, 0), "products/home-use/nile-aqua-innovica-lavish.jpg"),
+    cleanWaterXl: await uploadCrop(POSTER_B, posterBCell(1, 0), "products/home-use/clean-water-aqua-xl-silver.jpg"),
+    nileV5: await uploadCrop(POSTER_B, posterBCell(0, 1), "products/home-use/nile-aqua-v5.jpg"),
+    cleanWaterHiFlo: await uploadCrop(POSTER_B, posterBCell(1, 1), "products/home-use/clean-water-hi-flo.jpg"),
+    aquaGridTeal: await uploadCrop(POSTER_B, posterBCell(0, 2), "products/home-use/aqua-grid-teal.jpg"),
+    aquaGridCharcoal: await uploadCrop(POSTER_B, posterBCell(1, 2), "products/home-use/aqua-grid-charcoal.jpg"),
+  };
 
   console.log("Uploading individual commercial product images...");
   const commercialImages = {
@@ -88,25 +138,25 @@ async function main() {
 
   const products: SeedProduct[] = [
     // Home Use — Poster A ("Pure Solutions")
-    { slug: "lexpure-vedic", name: "LexPure Vedic", price: 15000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "A reliable RO water purifier for everyday home use." },
-    { slug: "vista-pro", name: "Vista Pro", price: 18000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "Advanced multi-stage purification for modern kitchens." },
-    { slug: "3-stage-ro-system-blue", name: "3 Stage RO System (Blue)", price: 16000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "Compact 3-stage reverse osmosis system." },
-    { slug: "3-stage-ro-system-white", name: "3 Stage RO System (White)", price: 9000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "Budget-friendly 3-stage reverse osmosis system." },
-    { slug: "aqua-glory", name: "Aqua Glory", price: 7000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "Entry-level RO purifier with reliable daily performance." },
-    { slug: "aqua-cyclone", name: "Aqua Cyclone", price: 12000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "Alkaline RO purifier for enhanced mineral water." },
-    { slug: "aquagrand-ro-uv", name: "AquaGrand RO + UV", price: 14000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "Combined RO and UV purification for extra safety." },
-    { slug: "aqua-touch", name: "Aqua Touch", price: 9000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "Sleek, touch-friendly RO purifier for compact kitchens." },
-    { slug: "aqua-roma", name: "Aqua Roma", price: 8000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "Stylish RO purifier available in multiple colors." },
-    { slug: "neptune-aps", name: "Neptune (APS)", price: 10000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "Dependable mid-range RO purifier for families." },
-    { slug: "aqua-innovica", name: "Aqua Innovica", price: 20000, categorySlug: "home-use", imageUrl: homeUsePosterA, description: "Premium RO purifier with advanced filtration technology." },
+    { slug: "lexpure-vedic", name: "LexPure Vedic", price: 15000, categorySlug: "home-use", imageUrl: homeUse.lexpureVedic, description: "A reliable RO water purifier for everyday home use." },
+    { slug: "vista-pro", name: "Vista Pro", price: 18000, categorySlug: "home-use", imageUrl: homeUse.vistaPro, description: "Advanced multi-stage purification for modern kitchens." },
+    { slug: "3-stage-ro-system-blue", name: "3 Stage RO System (Blue)", price: 16000, categorySlug: "home-use", imageUrl: homeUse.roBlue, description: "Compact 3-stage reverse osmosis system." },
+    { slug: "3-stage-ro-system-white", name: "3 Stage RO System (White)", price: 9000, categorySlug: "home-use", imageUrl: homeUse.roWhite, description: "Budget-friendly 3-stage reverse osmosis system." },
+    { slug: "aqua-glory", name: "Aqua Glory", price: 7000, categorySlug: "home-use", imageUrl: homeUse.aquaGlory, description: "Entry-level RO purifier with reliable daily performance." },
+    { slug: "aqua-cyclone", name: "Aqua Cyclone", price: 12000, categorySlug: "home-use", imageUrl: homeUse.aquaCyclone, description: "Alkaline RO purifier for enhanced mineral water." },
+    { slug: "aquagrand-ro-uv", name: "AquaGrand RO + UV", price: 14000, categorySlug: "home-use", imageUrl: homeUse.aquagrand, description: "Combined RO and UV purification for extra safety." },
+    { slug: "aqua-touch", name: "Aqua Touch", price: 9000, categorySlug: "home-use", imageUrl: homeUse.aquaTouch, description: "Sleek, touch-friendly RO purifier for compact kitchens." },
+    { slug: "aqua-roma", name: "Aqua Roma", price: 8000, categorySlug: "home-use", imageUrl: homeUse.aquaRoma, description: "Stylish RO purifier available in multiple colors." },
+    { slug: "neptune-aps", name: "Neptune (APS)", price: 10000, categorySlug: "home-use", imageUrl: homeUse.neptune, description: "Dependable mid-range RO purifier for families." },
+    { slug: "aqua-innovica", name: "Aqua Innovica", price: 20000, categorySlug: "home-use", imageUrl: homeUse.aquaInnovica, description: "Premium RO purifier with advanced filtration technology." },
 
     // Home Use — Poster B
-    { slug: "nile-aqua-innovica-lavish", name: "Nile Aqua Innovica – Lavish", price: 12000, categorySlug: "home-use", imageUrl: homeUsePosterB, description: "Zinc, copper & alkaline enrichment with LED indicators." },
-    { slug: "clean-water-aqua-xl-silver", name: "Clean Water Aqua XL – Silver", price: 10000, categorySlug: "home-use", imageUrl: homeUsePosterB, description: "RO + TDS control with a digital LED display." },
-    { slug: "nile-aqua-v5", name: "Nile Aqua V5", price: 9500, categorySlug: "home-use", imageUrl: homeUsePosterB, description: "Premium, perfectly sized alkaline RO purifier." },
-    { slug: "clean-water-hi-flo", name: "Clean Water Hi-Flo", price: 9000, categorySlug: "home-use", imageUrl: homeUsePosterB, description: "Advanced technology with durable contours." },
-    { slug: "aqua-grid-teal", name: "Aqua Grid – Teal", price: 8000, categorySlug: "home-use", imageUrl: homeUsePosterB, description: "10L detachable storage tank with smart LED blinking." },
-    { slug: "aqua-grid-charcoal", name: "Aqua Grid – Charcoal", price: 8000, categorySlug: "home-use", imageUrl: homeUsePosterB, description: "10L detachable storage tank with smart LED blinking, in charcoal." },
+    { slug: "nile-aqua-innovica-lavish", name: "Nile Aqua Innovica – Lavish", price: 12000, categorySlug: "home-use", imageUrl: homeUse.nileInnovicaLavish, description: "Zinc, copper & alkaline enrichment with LED indicators." },
+    { slug: "clean-water-aqua-xl-silver", name: "Clean Water Aqua XL – Silver", price: 10000, categorySlug: "home-use", imageUrl: homeUse.cleanWaterXl, description: "RO + TDS control with a digital LED display." },
+    { slug: "nile-aqua-v5", name: "Nile Aqua V5", price: 9500, categorySlug: "home-use", imageUrl: homeUse.nileV5, description: "Premium, perfectly sized alkaline RO purifier." },
+    { slug: "clean-water-hi-flo", name: "Clean Water Hi-Flo", price: 9000, categorySlug: "home-use", imageUrl: homeUse.cleanWaterHiFlo, description: "Advanced technology with durable contours." },
+    { slug: "aqua-grid-teal", name: "Aqua Grid – Teal", price: 8000, categorySlug: "home-use", imageUrl: homeUse.aquaGridTeal, description: "10L detachable storage tank with smart LED blinking." },
+    { slug: "aqua-grid-charcoal", name: "Aqua Grid – Charcoal", price: 8000, categorySlug: "home-use", imageUrl: homeUse.aquaGridCharcoal, description: "10L detachable storage tank with smart LED blinking, in charcoal." },
 
     // Commercial Use
     { slug: "industrial-containerized-ro-plant", name: "Industrial Containerized RO Plant", price: 3500000, categorySlug: "commercial", imageUrl: commercialImages.industrialContainer, description: "Large-scale containerized reverse osmosis plant for industrial water treatment." },
