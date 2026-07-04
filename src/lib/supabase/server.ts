@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { getSupabaseUrl, getSupabaseAnonKey } from "./env";
 
 // Used inside Server Components, Server Actions, and Route Handlers.
 // `cookies()` is async (Next.js 15+/16 Async Request APIs), so this
@@ -8,8 +9,8 @@ export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    getSupabaseUrl(),
+    getSupabaseAnonKey(),
     {
       cookies: {
         getAll() {
