@@ -7,24 +7,59 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 
+type Step = "credentials" | "otp";
+
 export function LoginForm() {
+  const [step, setStep] = useState<Step>("credentials");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  async function handleSubmit(e: React.FormEvent) {
+  // Step 1: verify the password server-side, then email a one-time code.
+  async function handleCredentialsSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/auth/request-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? "Invalid email or password");
+        return;
+      }
+
+      setStep("otp");
+    } catch {
+      setError(
+        "Could not reach the server. Please check your connection and try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Step 2: verify the code — this is what actually creates the session.
+  async function handleOtpSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.verifyOtp({
         email,
-        password,
+        token: otp,
+        type: "email",
       });
 
       if (error) {
@@ -36,10 +71,6 @@ export function LoginForm() {
       router.push(next);
       router.refresh();
     } catch {
-      // Network/config failures (e.g. an unreachable Supabase project)
-      // throw instead of returning a normal `error` field — without this
-      // catch, the button would stay stuck on "Signing in…" with no
-      // feedback at all.
       setError(
         "Could not reach the server. Please check your connection and try again."
       );
@@ -48,8 +79,54 @@ export function LoginForm() {
     }
   }
 
+  async function handleResend() {
+    setError(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false },
+    });
+    setError(error ? error.message : "A new code has been sent.");
+  }
+
+  if (step === "otp") {
+    return (
+      <form onSubmit={handleOtpSubmit} className="flex flex-col gap-4">
+        <p className="text-sm text-slate-600">
+          We sent a one-time code to <strong>{email}</strong>. Enter it below
+          to log in.
+        </p>
+        <div>
+          <Label htmlFor="otp">One-time code</Label>
+          <Input
+            id="otp"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            required
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+          />
+        </div>
+
+        {error && <p className="text-sm text-red-600">{error}</p>}
+
+        <Button type="submit" disabled={loading} className="mt-2 w-full">
+          {loading ? "Verifying…" : "Verify & Log In"}
+        </Button>
+
+        <button
+          type="button"
+          onClick={handleResend}
+          className="text-center text-sm font-medium text-brand-600"
+        >
+          Resend code
+        </button>
+      </form>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleCredentialsSubmit} className="flex flex-col gap-4">
       <div>
         <Label htmlFor="email">Email</Label>
         <Input
@@ -74,7 +151,7 @@ export function LoginForm() {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Button type="submit" disabled={loading} className="mt-2 w-full">
-        {loading ? "Signing in…" : "Log In"}
+        {loading ? "Sending code…" : "Continue"}
       </Button>
 
       <p className="text-center text-sm text-slate-500">

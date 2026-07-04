@@ -58,6 +58,23 @@ auth emails through Resend instead:
 This is a dashboard-only configuration step — no code or `.env` changes are
 needed for this.
 
+### Enable the one-time login code in emails
+
+Login works as: enter email + password, get a 6-digit code by email, enter
+the code to finish logging in. Supabase's default "Magic Link" email
+template only shows a clickable link, not the raw code, so you need to
+add it:
+
+1. In Supabase, go to **Authentication -> Email Templates -> Magic Link**.
+2. Add `{{ .Token }}` somewhere in the template, e.g.:
+   ```html
+   <h2>Your Aqua Guide login code</h2>
+   <p>Enter this code to finish logging in:</p>
+   <h1>{{ .Token }}</h1>
+   ```
+3. Save. This template is used for both magic links and OTP codes, so this
+   is a one-time change — no further configuration needed.
+
 ## 5. Fill in your `.env.local`
 
 ```bash
