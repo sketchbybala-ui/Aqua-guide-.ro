@@ -19,24 +19,33 @@ export function SignupForm() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-      },
-    });
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName },
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+        },
+      });
 
-    setLoading(false);
+      if (error) {
+        setError(error.message);
+        return;
+      }
 
-    if (error) {
-      setError(error.message);
-      return;
+      setSubmitted(true);
+    } catch {
+      // Network/config failures throw instead of returning a normal
+      // `error` field — without this catch, the button would stay stuck
+      // with no feedback at all.
+      setError(
+        "Could not reach the server. Please check your connection and try again."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setSubmitted(true);
   }
 
   if (submitted) {

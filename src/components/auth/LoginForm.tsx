@@ -20,22 +20,32 @@ export function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    setLoading(false);
+      if (error) {
+        setError(error.message);
+        return;
+      }
 
-    if (error) {
-      setError(error.message);
-      return;
+      const next = searchParams.get("next") ?? "/";
+      router.push(next);
+      router.refresh();
+    } catch {
+      // Network/config failures (e.g. an unreachable Supabase project)
+      // throw instead of returning a normal `error` field — without this
+      // catch, the button would stay stuck on "Signing in…" with no
+      // feedback at all.
+      setError(
+        "Could not reach the server. Please check your connection and try again."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    const next = searchParams.get("next") ?? "/";
-    router.push(next);
-    router.refresh();
   }
 
   return (
