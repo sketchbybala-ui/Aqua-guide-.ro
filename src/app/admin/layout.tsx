@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 
+// Reads the logged-in user's session on every request — applies to this
+// whole route subtree, so no admin page is ever statically prerendered.
+export const dynamic = "force-dynamic";
+
 // Server-side admin gate: redirects non-admins before any admin UI or data
 // is ever sent to the browser. This is layered on top of the RLS policies
 // on products/categories (which reject non-admin writes at the DB level

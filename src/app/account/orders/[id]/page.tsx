@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { formatINR } from "@/lib/format";
 import { Badge } from "@/components/ui/Badge";
 
+// Reads the logged-in user's session — never statically prerendered.
+export const dynamic = "force-dynamic";
+
 export default async function OrderDetailPage({
   params,
 }: {

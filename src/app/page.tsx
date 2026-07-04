@@ -4,6 +4,12 @@ import { Hero } from "@/components/home/Hero";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { CategorySection } from "@/components/product/CategorySection";
 
+// Reads from Supabase on every request — never statically prerendered.
+// Without this, `next build` can try to prerender the page at build time,
+// which fails if Supabase env vars aren't set yet (e.g. a first Vercel
+// deploy before the project's environment variables are configured).
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const supabase = await createClient();
 

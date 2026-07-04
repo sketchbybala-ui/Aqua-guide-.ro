@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { LinkButton } from "@/components/ui/Button";
 import { formatINR } from "@/lib/format";
 
+// Reads from Supabase on every request — never statically prerendered.
+export const dynamic = "force-dynamic";
+
 // Next.js 16: searchParams are async.
 export default async function CheckoutSuccessPage({
   searchParams,

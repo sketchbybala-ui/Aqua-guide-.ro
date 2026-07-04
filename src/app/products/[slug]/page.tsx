@@ -4,6 +4,9 @@ import { getProductBySlug } from "@/lib/products";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductInfo } from "@/components/product/ProductInfo";
 
+// Reads from Supabase on every request — never statically prerendered.
+export const dynamic = "force-dynamic";
+
 // Next.js 16: dynamic route `params` are async.
 export async function generateMetadata({
   params,

@@ -5,7 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
+  useRef,
   useState,
 } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -48,28 +48,34 @@ function writeGuestCart(items: CartLine[]) {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartLine[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = useMemo(() => createClient(), []);
 
-  const loadCartForUser = useCallback(
-    async (userId: string) => {
-      const { data } = await supabase
-        .from("cart_items")
-        .select("quantity, products(id, slug, name, price, image_url)")
-        .eq("user_id", userId);
+  // Lazily created on first actual use (inside an effect or event handler)
+  // — never during render. Next.js server-renders "use client" components
+  // too, and creating the Supabase client eagerly (e.g. via useMemo, which
+  // runs during render) would crash SSR if env vars aren't resolvable yet.
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+  function getSupabase() {
+    if (!supabaseRef.current) supabaseRef.current = createClient();
+    return supabaseRef.current;
+  }
 
-      const rows = (data ?? []) as unknown as {
-        quantity: number;
-        products: CartLine["product"];
-      }[];
+  const loadCartForUser = useCallback(async (userId: string) => {
+    const { data } = await getSupabase()
+      .from("cart_items")
+      .select("quantity, products(id, slug, name, price, image_url)")
+      .eq("user_id", userId);
 
-      setItems(
-        rows
-          .filter((row) => row.products)
-          .map((row) => ({ product: row.products, quantity: row.quantity }))
-      );
-    },
-    [supabase]
-  );
+    const rows = (data ?? []) as unknown as {
+      quantity: number;
+      products: CartLine["product"];
+    }[];
+
+    setItems(
+      rows
+        .filter((row) => row.products)
+        .map((row) => ({ product: row.products, quantity: row.quantity }))
+    );
+  }, []);
 
   // On first load: merge any guest cart into the DB cart if the user is
   // already logged in, otherwise fall back to the guest (localStorage) cart.
@@ -77,6 +83,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     let active = true;
 
     (async () => {
+      const supabase = getSupabase();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -111,10 +118,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return () => {
       active = false;
     };
-  }, [supabase, loadCartForUser]);
+  }, [loadCartForUser]);
 
   const addItem: CartContextValue["addItem"] = useCallback(
     async (product, quantity = 1) => {
+      const supabase = getSupabase();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -142,11 +150,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         });
       }
     },
-    [items, supabase, loadCartForUser]
+    [items, loadCartForUser]
   );
 
   const updateQuantity: CartContextValue["updateQuantity"] = useCallback(
     async (productId, quantity) => {
+      const supabase = getSupabase();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -179,7 +188,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         });
       }
     },
-    [supabase, loadCartForUser]
+    [loadCartForUser]
   );
 
   const removeItem = useCallback(
@@ -188,6 +197,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const clearCart = useCallback(async () => {
+    const supabase = getSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -198,7 +208,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.removeItem(GUEST_CART_KEY);
     }
     setItems([]);
-  }, [supabase]);
+  }, []);
 
   const subtotal = items.reduce(
     (sum, i) => sum + i.product.price * i.quantity,

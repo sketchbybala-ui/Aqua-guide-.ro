@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Home Use Water Purifiers | Aqua Guide",
 };
 
+// Reads from Supabase on every request — never statically prerendered.
+export const dynamic = "force-dynamic";
+
 export default async function HomeUsePage() {
   const products = await getActiveProductsByCategory("home-use");
 

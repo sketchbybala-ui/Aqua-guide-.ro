@@ -3,6 +3,9 @@ import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 
+// Reads the logged-in user's session — never statically prerendered.
+export const dynamic = "force-dynamic";
+
 export default async function AccountPage() {
   const user = await requireUser();
   const supabase = await createClient();
