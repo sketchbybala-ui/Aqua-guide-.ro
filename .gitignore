@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local intermediate artifacts from one-off image-processing scripts
+/.cache
