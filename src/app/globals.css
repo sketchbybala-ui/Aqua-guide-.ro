@@ -30,3 +30,76 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/* RO purifier hero animation (see components/home/RoMachineAnimation.tsx) */
+@keyframes ro-drip {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(34px);
+    opacity: 0;
+  }
+}
+
+@keyframes ro-ripple {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes ro-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes ro-flow {
+  0% {
+    stroke-dashoffset: 24;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-ro-drip {
+  animation: ro-drip 1.8s ease-in infinite;
+}
+
+.animate-ro-ripple {
+  animation: ro-ripple 1.8s ease-out infinite;
+}
+
+.animate-ro-pulse {
+  animation: ro-pulse 2s ease-in-out infinite;
+}
+
+.animate-ro-flow {
+  animation: ro-flow 1.2s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ro-drip,
+  .animate-ro-ripple,
+  .animate-ro-pulse,
+  .animate-ro-flow {
+    animation: none;
+  }
+}
