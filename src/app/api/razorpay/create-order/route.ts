@@ -6,7 +6,7 @@ import { createRazorpayClient } from "@/lib/razorpay/client";
 // Creates a Razorpay order for the current user's cart. The amount is
 // always computed here from the DB's current product prices — the client
 // never gets to say how much an order costs.
-export async function POST() {
+export async function POST(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -14,6 +14,17 @@ export async function POST() {
 
   if (!user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { shippingName, shippingPhone, shippingAddress } = await request
+    .json()
+    .catch(() => ({}));
+
+  if (!shippingName || !shippingPhone || !shippingAddress) {
+    return NextResponse.json(
+      { error: "Shipping name, phone, and address are required" },
+      { status: 400 }
+    );
   }
 
   const { data: cartRows } = await supabase
@@ -41,7 +52,14 @@ export async function POST() {
 
   const { data: order, error: orderError } = await admin
     .from("orders")
-    .insert({ user_id: user.id, total_amount: totalAmount, currency: "INR" })
+    .insert({
+      user_id: user.id,
+      total_amount: totalAmount,
+      currency: "INR",
+      shipping_name: shippingName,
+      shipping_phone: shippingPhone,
+      shipping_address: shippingAddress,
+    })
     .select()
     .single();
 

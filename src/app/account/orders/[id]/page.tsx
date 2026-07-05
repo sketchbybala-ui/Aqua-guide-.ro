@@ -59,6 +59,19 @@ export default async function OrderDetailPage({
         </span>
       </div>
 
+      {order.shipping_address && (
+        <div className="mt-4 rounded-2xl border border-slate-100 p-4 text-sm">
+          <h2 className="mb-2 font-semibold text-slate-700">
+            Shipping Address
+          </h2>
+          <p className="text-slate-700">{order.shipping_name}</p>
+          <p className="text-slate-500">{order.shipping_phone}</p>
+          <p className="mt-1 whitespace-pre-line text-slate-500">
+            {order.shipping_address}
+          </p>
+        </div>
+      )}
+
       <p className="mt-6 text-xs text-slate-400">
         Placed on{" "}
         {new Date(order.created_at).toLocaleDateString("en-IN", {

@@ -15,7 +15,19 @@ declare global {
   }
 }
 
-export function RazorpayButton() {
+export type ShippingInfo = {
+  name: string;
+  phone: string;
+  address: string;
+};
+
+export function RazorpayButton({
+  shippingInfo,
+  disabled = false,
+}: {
+  shippingInfo: ShippingInfo;
+  disabled?: boolean;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -27,6 +39,12 @@ export function RazorpayButton() {
     try {
       const createRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shippingName: shippingInfo.name,
+          shippingPhone: shippingInfo.phone,
+          shippingAddress: shippingInfo.address,
+        }),
       });
       const order = await createRes.json();
 
@@ -85,7 +103,7 @@ export function RazorpayButton() {
         strategy="lazyOnload"
       />
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <Button onClick={handlePay} disabled={loading} className="w-full">
+      <Button onClick={handlePay} disabled={loading || disabled} className="w-full">
         {loading ? "Starting checkout…" : "Pay with Razorpay"}
       </Button>
     </div>
