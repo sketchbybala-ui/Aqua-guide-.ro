@@ -33,31 +33,29 @@ body {
   color: var(--foreground);
 }
 
-/* RO purifier hero animation (see components/home/RoMachineAnimation.tsx) */
-@keyframes ro-drip {
+/* Hero water-tank animation (see components/home/WaterTankAnimation.tsx) */
+@keyframes wave-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-320px);
+  }
+}
+
+@keyframes ro-bubble {
   0% {
     transform: translateY(0);
     opacity: 0;
   }
-  15% {
-    opacity: 1;
+  10% {
+    opacity: 0.8;
   }
-  75% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(34px);
-    opacity: 0;
-  }
-}
-
-@keyframes ro-ripple {
-  0% {
-    transform: scale(0.4);
-    opacity: 0.55;
+  85% {
+    opacity: 0.3;
   }
   100% {
-    transform: scale(2.2);
+    transform: translateY(-95px);
     opacity: 0;
   }
 }
@@ -65,43 +63,34 @@ body {
 @keyframes ro-pulse {
   0%,
   100% {
-    opacity: 1;
+    opacity: 0.25;
   }
   50% {
-    opacity: 0.35;
+    opacity: 0.6;
   }
 }
 
-@keyframes ro-flow {
-  0% {
-    stroke-dashoffset: 24;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
+.animate-wave-scroll-slow {
+  animation: wave-scroll 6s linear infinite;
 }
 
-.animate-ro-drip {
-  animation: ro-drip 1.8s ease-in infinite;
+.animate-wave-scroll-fast {
+  animation: wave-scroll 3.5s linear infinite;
 }
 
-.animate-ro-ripple {
-  animation: ro-ripple 1.8s ease-out infinite;
+.animate-ro-bubble {
+  animation: ro-bubble 4s ease-in infinite;
 }
 
 .animate-ro-pulse {
-  animation: ro-pulse 2s ease-in-out infinite;
-}
-
-.animate-ro-flow {
-  animation: ro-flow 1.2s linear infinite;
+  animation: ro-pulse 2.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-ro-drip,
-  .animate-ro-ripple,
-  .animate-ro-pulse,
-  .animate-ro-flow {
+  .animate-wave-scroll-slow,
+  .animate-wave-scroll-fast,
+  .animate-ro-bubble,
+  .animate-ro-pulse {
     animation: none;
   }
 }

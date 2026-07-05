@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { LinkButton } from "@/components/ui/Button";
 import { PriceTag } from "@/components/ui/PriceTag";
-import { RoMachineAnimation } from "./RoMachineAnimation";
+import { WaterTankAnimation } from "./WaterTankAnimation";
 import type { Product } from "@/lib/types";
 
 type SpotlightProduct = Pick<Product, "slug" | "name" | "price" | "image_url">;
@@ -11,8 +11,22 @@ export function Hero({ spotlightProducts = [] }: { spotlightProducts?: Spotlight
   const [first, second] = spotlightProducts;
 
   return (
-    <section className="overflow-hidden bg-gradient-to-b from-brand-100 via-brand-50 to-white">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2">
+    <section className="relative overflow-hidden bg-gradient-to-b from-brand-100 via-brand-50 to-white">
+      {/* decorative background: soft glows + dot texture */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-brand-200/50 blur-3xl" />
+        <div className="absolute -right-16 top-40 h-80 w-80 rounded-full bg-brand-300/30 blur-3xl" />
+        <svg className="absolute inset-0 h-full w-full opacity-[0.35]" aria-hidden="true">
+          <defs>
+            <pattern id="hero-dots" width="26" height="26" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1.6" fill="#93c5fd" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hero-dots)" />
+        </svg>
+      </div>
+
+      <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2">
         <div className="flex flex-col items-start gap-6">
           <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-brand-700 shadow-sm">
             Pure Water. Healthy Life.
@@ -34,23 +48,35 @@ export function Hero({ spotlightProducts = [] }: { spotlightProducts?: Spotlight
         </div>
 
         <div className="relative mx-auto w-full max-w-sm lg:max-w-none">
-          <div className="absolute inset-0 -z-10 rounded-full bg-brand-200/50 blur-3xl" />
-          <RoMachineAnimation className="w-full" />
+          <WaterTankAnimation className="w-full" />
 
           {first && (
             <SpotlightCard
               product={first}
-              className="absolute -left-4 top-6 -rotate-3 sm:-left-10"
+              className="absolute -left-4 top-2 -rotate-3 sm:-left-10"
             />
           )}
           {second && (
             <SpotlightCard
               product={second}
-              className="absolute -right-2 bottom-16 rotate-3 sm:-right-6"
+              className="absolute -right-2 bottom-6 rotate-3 sm:-right-6"
             />
           )}
         </div>
       </div>
+
+      {/* wave divider flowing into the TrustBar below */}
+      <svg
+        className="relative block w-full text-brand-900"
+        viewBox="0 0 1440 80"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M0 40c120 24 240 24 360 8s240-24 360-8 240 24 360 8 240-24 360-8v40H0Z"
+          fill="currentColor"
+        />
+      </svg>
     </section>
   );
 }

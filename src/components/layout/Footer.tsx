@@ -1,12 +1,16 @@
 import Link from "next/link";
+import { LogoMark } from "./Logo";
 
 export function Footer() {
   return (
     <footer className="mt-24 bg-brand-900">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-          <span className="text-lg font-bold tracking-tight text-white">
-            Aqua<span className="text-brand-200">Guide</span>
+          <span className="inline-flex items-center gap-2.5">
+            <LogoMark className="h-8 w-auto" />
+            <span className="text-lg font-bold tracking-tight text-white">
+              Aqua<span className="text-brand-200">Guide</span>
+            </span>
           </span>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-blue-100">
             <Link href="/home-use" className="hover:text-white">
