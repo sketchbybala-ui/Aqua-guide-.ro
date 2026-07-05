@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useState } from "react";
 import { useCart } from "@/lib/cart/cart-context";
 import { Logo } from "./Logo";
+import { ProfileMenu } from "./ProfileMenu";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 
 const navLinks = [
@@ -16,20 +16,7 @@ const navLinks = [
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { count } = useCart();
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    supabase.auth.getUser().then(({ data }) => setIsLoggedIn(!!data.user));
-
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event, session) => setIsLoggedIn(!!session?.user)
-    );
-
-    return () => subscription.subscription.unsubscribe();
-  }, []);
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/90 backdrop-blur">
@@ -50,13 +37,8 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href={isLoggedIn ? "/account" : "/login"}
-            className="hidden text-sm font-medium text-slate-600 hover:text-brand-600 sm:block"
-          >
-            {isLoggedIn ? "My Account" : "Login"}
-          </Link>
+        <div className="flex items-center gap-1">
+          <ProfileMenu />
 
           <button
             aria-label="Open cart"
@@ -93,13 +75,6 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href={isLoggedIn ? "/account" : "/login"}
-            onClick={() => setMenuOpen(false)}
-            className="block py-2 text-sm font-medium text-slate-600 hover:text-brand-600"
-          >
-            {isLoggedIn ? "My Account" : "Login"}
-          </Link>
         </nav>
       )}
 
