@@ -1,9 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { getActiveProductsByCategory } from "@/lib/products";
 import { Hero } from "@/components/home/Hero";
-import { TrustBar } from "@/components/home/TrustBar";
+import { StatsBar } from "@/components/home/StatsBar";
 import { ProductShowcase } from "@/components/home/ProductShowcase";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
+import { WhyChooseUs } from "@/components/home/WhyChooseUs";
+import { CtaBanner } from "@/components/home/CtaBanner";
 import { CategorySection } from "@/components/product/CategorySection";
 
 // Reads from Supabase on every request — never statically prerendered.
@@ -15,6 +17,13 @@ export const dynamic = "force-dynamic";
 // Hand-picked for the front-page photo showcase — a diverse, photogenic
 // mix across both categories (all with clean cutout photos).
 const SHOWCASE_SLUGS = ["vista-pro", "ss-aqua-ro-mobile-unit", "aqua-touch"];
+
+// A trimmed, transparent (no baked-in white canvas or caption text) cutout
+// of the AquaGrand RO+UV unit — see scripts/upload-hero-image.mjs. The
+// regular catalog photos have a white canvas + spec caption baked in
+// (fine for product cards), which looks wrong blown up large in the hero.
+const HERO_IMAGE_URL =
+  "https://xdyouevsulbaiuwuumpi.supabase.co/storage/v1/object/public/product-images/products/hero/aquagrand-ro-uv-transparent.png";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -30,7 +39,7 @@ export default async function HomePage() {
         // homepage only ever leads with clean, consistent product photos.
         .neq("slug", "industrial-containerized-ro-plant")
         .order("price", { ascending: false })
-        .limit(4),
+        .limit(8),
       supabase
         .from("products")
         .select("slug, name, price, image_url")
@@ -45,8 +54,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero spotlightProducts={(featured ?? []).slice(0, 2)} />
-      <TrustBar />
+      <Hero heroImageUrl={HERO_IMAGE_URL} />
+      <StatsBar />
       <ProductShowcase products={showcase} />
       <FeaturedProducts products={featured ?? []} />
       <CategorySection
@@ -62,6 +71,8 @@ export default async function HomePage() {
         products={commercial}
         tone="tint"
       />
+      <WhyChooseUs />
+      <CtaBanner />
     </>
   );
 }
