@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { GoogleSignInButton } from "./GoogleSignInButton";
+import { friendlyAuthError } from "@/lib/auth-errors";
 
 type Step = "details" | "otp";
 
@@ -35,7 +36,7 @@ export function SignupForm() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(friendlyAuthError(error.message));
         return;
       }
 
@@ -67,7 +68,7 @@ export function SignupForm() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(friendlyAuthError(error.message));
         return;
       }
 
@@ -86,7 +87,7 @@ export function SignupForm() {
     setError(null);
     const supabase = createClient();
     const { error } = await supabase.auth.resend({ type: "signup", email });
-    setError(error ? error.message : "A new code has been sent.");
+    setError(error ? friendlyAuthError(error.message) : "A new code has been sent.");
   }
 
   if (step === "otp") {

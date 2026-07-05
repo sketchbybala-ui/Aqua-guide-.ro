@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { GoogleSignInButton } from "./GoogleSignInButton";
+import { friendlyAuthError } from "@/lib/auth-errors";
 
 type Step = "credentials" | "otp";
 
@@ -35,7 +36,7 @@ export function LoginForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Invalid email or password");
+        setError(friendlyAuthError(data.error));
         return;
       }
 
@@ -64,7 +65,7 @@ export function LoginForm() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(friendlyAuthError(error.message));
         return;
       }
 
@@ -87,7 +88,7 @@ export function LoginForm() {
       email,
       options: { shouldCreateUser: false },
     });
-    setError(error ? error.message : "A new code has been sent.");
+    setError(error ? friendlyAuthError(error.message) : "A new code has been sent.");
   }
 
   if (step === "otp") {
