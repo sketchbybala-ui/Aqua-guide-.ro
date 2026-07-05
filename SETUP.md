@@ -75,6 +75,21 @@ add it:
 3. Save. This template is used for both magic links and OTP codes, so this
    is a one-time change — no further configuration needed.
 
+Signup uses the **same code-entry pattern** but a separate template — go to
+**Authentication -> Email Templates -> Confirm signup** and add `{{ .Token }}`
+there too, e.g.:
+```html
+<h2>Welcome to Aqua Guide</h2>
+<p>Enter this code to finish creating your account:</p>
+<h1>{{ .Token }}</h1>
+```
+
+> **Note on Resend's free sender**: until you verify your own domain in
+> Resend, the shared `onboarding@resend.dev` sender can only deliver to
+> the email address on your Resend account — codes to any other address
+> will silently fail to send. Verify your own domain in Resend before
+> real users need to sign up or log in.
+
 ### Enable "Continue with Google"
 
 The login and signup pages both have a Google button already wired up in

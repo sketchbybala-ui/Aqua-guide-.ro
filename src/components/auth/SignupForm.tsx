@@ -1,21 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 
+type Step = "details" | "otp";
+
 export function SignupForm() {
+  const [step, setStep] = useState<Step>("details");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent) {
+  // Step 1: create the (unconfirmed) account — this emails a one-time code.
+  async function handleDetailsSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -25,10 +31,7 @@ export function SignupForm() {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: { full_name: fullName },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-        },
+        options: { data: { full_name: fullName } },
       });
 
       if (error) {
@@ -36,7 +39,7 @@ export function SignupForm() {
         return;
       }
 
-      setSubmitted(true);
+      setStep("otp");
     } catch {
       // Network/config failures throw instead of returning a normal
       // `error` field — without this catch, the button would stay stuck
@@ -49,17 +52,81 @@ export function SignupForm() {
     }
   }
 
-  if (submitted) {
+  // Step 2: verify the code — this confirms the account and logs you in.
+  async function handleOtpSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: "signup",
+      });
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      router.push("/");
+      router.refresh();
+    } catch {
+      setError(
+        "Could not reach the server. Please check your connection and try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResend() {
+    setError(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    setError(error ? error.message : "A new code has been sent.");
+  }
+
+  if (step === "otp") {
     return (
-      <p className="text-sm text-slate-600">
-        Check your inbox at <strong>{email}</strong> for a confirmation link
-        to finish creating your account.
-      </p>
+      <form onSubmit={handleOtpSubmit} className="flex flex-col gap-4">
+        <p className="text-sm text-slate-600">
+          We sent a one-time code to <strong>{email}</strong>. Enter it below
+          to finish creating your account.
+        </p>
+        <div>
+          <Label htmlFor="signup-otp">One-time code</Label>
+          <Input
+            id="signup-otp"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            required
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+          />
+        </div>
+
+        {error && <p className="text-sm text-red-600">{error}</p>}
+
+        <Button type="submit" disabled={loading} className="mt-2 w-full">
+          {loading ? "Verifying…" : "Verify & Create Account"}
+        </Button>
+
+        <button
+          type="button"
+          onClick={handleResend}
+          className="text-center text-sm font-medium text-brand-600"
+        >
+          Resend code
+        </button>
+      </form>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleDetailsSubmit} className="flex flex-col gap-4">
       <div>
         <Label htmlFor="fullName">Full name</Label>
         <Input
@@ -94,7 +161,7 @@ export function SignupForm() {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Button type="submit" disabled={loading} className="mt-2 w-full">
-        {loading ? "Creating account…" : "Sign Up"}
+        {loading ? "Sending code…" : "Continue"}
       </Button>
 
       <div className="flex items-center gap-3 text-xs text-slate-400">
