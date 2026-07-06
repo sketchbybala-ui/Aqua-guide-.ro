@@ -81,6 +81,7 @@ export interface Review {
   reviewer_name: string;
   rating: number;
   comment: string | null;
+  image_urls: string[];
   created_at: string;
   updated_at: string;
 }

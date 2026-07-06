@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Textarea, Label } from "@/components/ui/Input";
+
+const MAX_IMAGES = 4;
 
 export function ReviewForm({
   productId,
@@ -20,9 +23,12 @@ export function ReviewForm({
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -36,7 +42,7 @@ export function ReviewForm({
 
       const { data: existing } = await supabase
         .from("reviews")
-        .select("id, rating, comment")
+        .select("id, rating, comment, image_urls")
         .eq("product_id", productId)
         .eq("user_id", data.user.id)
         .maybeSingle();
@@ -45,11 +51,46 @@ export function ReviewForm({
         setExistingId(existing.id);
         setRating(existing.rating);
         setComment(existing.comment ?? "");
+        setImages(existing.image_urls ?? []);
       }
 
       setChecking(false);
     });
   }, [productId]);
+
+  async function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = ""; // allow picking the same file again later
+    if (files.length === 0) return;
+
+    const remaining = MAX_IMAGES - images.length;
+    if (remaining <= 0) {
+      setError(`You can attach up to ${MAX_IMAGES} photos.`);
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+
+    try {
+      for (const file of files.slice(0, remaining)) {
+        const body = new FormData();
+        body.append("file", file);
+        const res = await fetch("/api/reviews/upload-image", { method: "POST", body });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "Could not upload image");
+        setImages((prev) => [...prev, data.url]);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not upload image.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeImage(url: string) {
+    setImages((prev) => prev.filter((u) => u !== url));
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -84,6 +125,7 @@ export function ReviewForm({
           reviewer_name: reviewerName,
           rating,
           comment: comment.trim() || null,
+          image_urls: images,
         },
         { onConflict: "product_id,user_id" }
       );
@@ -156,12 +198,50 @@ export function ReviewForm({
         />
       </div>
 
+      <div>
+        <Label htmlFor="review-images">Photos (optional)</Label>
+        <div className="flex flex-wrap gap-2">
+          {images.map((url) => (
+            <div key={url} className="group relative h-16 w-16 overflow-hidden rounded-lg border border-slate-200">
+              <Image src={url} alt="" fill sizes="64px" className="object-cover" />
+              <button
+                type="button"
+                onClick={() => removeImage(url)}
+                aria-label="Remove photo"
+                className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-bl bg-black/60 text-xs text-white opacity-0 group-hover:opacity-100"
+              >
+                &times;
+              </button>
+            </div>
+          ))}
+          {images.length < MAX_IMAGES && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-300 text-xs text-slate-400 hover:border-brand-400 hover:text-brand-600 disabled:opacity-50"
+            >
+              {uploading ? "…" : "+ Add"}
+            </button>
+          )}
+        </div>
+        <input
+          id="review-images"
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          onChange={handleFilesSelected}
+          className="hidden"
+        />
+      </div>
+
       {error && <p className="text-sm text-red-600">{error}</p>}
       {done && !error && (
         <p className="text-sm text-green-600">Thanks — your review has been saved.</p>
       )}
 
-      <Button type="submit" disabled={saving} className="self-start">
+      <Button type="submit" disabled={saving || uploading} className="self-start">
         {saving ? "Saving…" : existingId ? "Update Review" : "Submit Review"}
       </Button>
     </form>

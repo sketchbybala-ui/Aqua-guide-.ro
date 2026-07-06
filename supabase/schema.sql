@@ -249,6 +249,7 @@ create table public.reviews (
   reviewer_name text not null,
   rating        smallint not null check (rating between 1 and 5),
   comment       text,
+  image_urls    text[] not null default '{}',
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now(),
   unique (product_id, user_id)

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { StarRating } from "@/components/ui/StarRating";
 import type { Review } from "@/lib/types";
 
@@ -23,6 +24,21 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
           <StarRating rating={review.rating} size={14} className="mt-1" />
           {review.comment && (
             <p className="mt-2 text-sm leading-relaxed text-slate-600">{review.comment}</p>
+          )}
+          {review.image_urls.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {review.image_urls.map((url) => (
+                <a
+                  key={url}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative h-16 w-16 overflow-hidden rounded-lg border border-slate-200"
+                >
+                  <Image src={url} alt="" fill sizes="64px" className="object-cover" />
+                </a>
+              ))}
+            </div>
           )}
         </li>
       ))}
