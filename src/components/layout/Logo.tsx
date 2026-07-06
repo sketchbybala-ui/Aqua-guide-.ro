@@ -1,43 +1,63 @@
-// Recreated (in code) to match the uploaded brand mark: a droplet with a
-// negative-space "A" cut out of it (true cutout via fill-rule evenodd, so
-// it reads correctly on any background colour), a wave swoosh across the
-// base, and the "Aqua Guide" wordmark. No external image asset.
+// Brand mark recreated (in code) from the user's reference: a two-tone
+// faceted droplet with a bold rounded "A" in negative space, riding on a
+// double wave swoosh. No external image asset — pure SVG, so it stays
+// crisp at any size and needs no network fetch.
 export function LogoMark({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 100 116" className={className} aria-hidden="true">
+    <svg viewBox="0 0 200 230" className={className} aria-hidden="true">
       <defs>
-        <linearGradient id="mark-drop" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="ag-dark" x1="0" y1="0" x2="0.3" y2="1">
           <stop offset="0%" stopColor="#1e3a8a" />
-          <stop offset="55%" stopColor="#2563eb" />
-          <stop offset="100%" stopColor="#38bdf8" />
+          <stop offset="100%" stopColor="#0f2050" />
         </linearGradient>
-        <linearGradient id="mark-wave-back" x1="0" y1="0" x2="1" y2="0">
+        <linearGradient id="ag-bright" x1="0" y1="0" x2="1" y2="0.9">
+          <stop offset="0%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#1d4ed8" />
+        </linearGradient>
+        <linearGradient id="ag-wave-back" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#1d4ed8" />
-          <stop offset="100%" stopColor="#2563eb" />
+          <stop offset="100%" stopColor="#1e40af" />
         </linearGradient>
-        <linearGradient id="mark-wave-front" x1="0" y1="0" x2="1" y2="0">
+        <linearGradient id="ag-wave-front" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#38bdf8" />
           <stop offset="100%" stopColor="#7dd3fc" />
         </linearGradient>
       </defs>
 
-      {/* droplet body with a true "A" cutout (evenodd hole) */}
+      {/* bright (right) body of the droplet */}
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        fill="url(#mark-drop)"
-        d="M50 2C33 24 15 50 15 70a35 35 0 0 0 70 0c0-20-18-46-35-68Z
-           M50 34 32 78h10l3.6-9h8.8l3.6 9h10L50 34Zm0 19.5 4.6 11h-9.2L50 53.5Z"
+        d="M100 8 C68 52 34 104 34 148 A66 66 0 0 0 166 148 C166 104 132 52 100 8 Z"
+        fill="url(#ag-bright)"
       />
 
-      {/* wave swoosh across the base */}
+      {/* dark left facet */}
       <path
-        d="M8 76c14 12 30 15 45 8 12-5.5 24-6 32 1-10-2-20 0-29 6-16 10-34 6-48-15Z"
-        fill="url(#mark-wave-back)"
+        d="M100 8 C80 40 60 75 48 112 C40 138 40 162 48 184 C36 168 27 148 27 130 C27 100 55 55 100 8 Z"
+        fill="url(#ag-dark)"
+      />
+
+      {/* "A" in negative space — thick rounded white strokes */}
+      <path
+        d="M100 56 L65 162 M100 56 L135 162 M82 132 L118 132"
+        stroke="#ffffff"
+        strokeWidth="15"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+
+      {/* double wave swoosh across the base */}
+      <path
+        d="M16 172 C34 196 62 214 96 214 C124 214 146 202 168 196
+           C182 192 190 192 188 196 C176 210 152 224 118 224
+           C78 224 44 206 22 182 C18 178 16 174 16 172 Z"
+        fill="url(#ag-wave-back)"
       />
       <path
-        d="M4 82c16 11 34 12 49 3 11-6.5 22-6 30 0-9-1-18 2-26 8-17 12-37 6-53-11Z"
-        fill="url(#mark-wave-front)"
+        d="M10 182 C30 204 58 220 92 220 C122 220 146 208 172 200
+           C182 197 188 197 186 200 C172 216 146 230 112 230
+           C72 230 38 212 16 190 C12 186 10 184 10 182 Z"
+        fill="url(#ag-wave-front)"
       />
     </svg>
   );
@@ -52,16 +72,17 @@ export function Logo({
 }) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <LogoMark className="h-9 w-auto" />
+      <LogoMark className="h-10 w-auto" />
       <span className="flex flex-col leading-none">
-        <span className="text-xl font-bold tracking-tight text-slate-900">
-          Aqua<span className="text-brand-600">Guide</span>
+        <span className="font-serif text-xl font-bold tracking-tight">
+          <span className="text-brand-900">Aqua</span>{" "}
+          <span className="text-brand-600">Guide</span>
         </span>
         {tagline && (
-          <span className="mt-1 flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-slate-400">
-            <span className="h-px w-4 bg-slate-300" />
+          <span className="mt-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+            <span className="h-px w-4 bg-brand-600" />
             Pure Water. Better Life.
-            <span className="h-px w-4 bg-slate-300" />
+            <span className="h-px w-4 bg-brand-600" />
           </span>
         )}
       </span>
