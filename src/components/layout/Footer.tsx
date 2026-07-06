@@ -33,6 +33,14 @@ export function Footer() {
               <Link href="/account/orders" className="hover:text-white">
                 Track Orders
               </Link>
+              <a
+                href="https://wa.me/919489368104?text=Hi%20Aqua%20Guide%2C%20I%20need%20help%20with%20a%20water%20purifier."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white"
+              >
+                Customer Care (WhatsApp)
+              </a>
             </nav>
           </div>
 
