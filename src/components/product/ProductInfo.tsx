@@ -6,14 +6,17 @@ import { useCart } from "@/lib/cart/cart-context";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import type { Product } from "@/lib/types";
+import { StarRating } from "@/components/ui/StarRating";
+import type { Product, RatingSummary } from "@/lib/types";
 
 export function ProductInfo({
   product,
   categoryLabel,
+  rating,
 }: {
   product: Product;
   categoryLabel: string;
+  rating?: RatingSummary;
 }) {
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
@@ -33,6 +36,14 @@ export function ProductInfo({
       <h1 className="text-3xl font-semibold text-slate-900">
         {product.name}
       </h1>
+      {rating && rating.review_count > 0 && (
+        <div className="flex items-center gap-2">
+          <StarRating rating={rating.avg_rating} />
+          <span className="text-sm text-slate-500">
+            {rating.avg_rating} ({rating.review_count} review{rating.review_count === 1 ? "" : "s"})
+          </span>
+        </div>
+      )}
       <PriceTag amount={product.price} className="text-2xl" />
       {product.description && (
         <p className="text-sm leading-relaxed text-slate-600">

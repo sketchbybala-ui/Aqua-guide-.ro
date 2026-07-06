@@ -6,14 +6,13 @@ import { createClient } from "@/lib/supabase/client";
 import { useCart } from "@/lib/cart/cart-context";
 import { formatINR } from "@/lib/format";
 import { RazorpayButton } from "@/components/checkout/RazorpayButton";
-import { Input, Label, Textarea } from "@/components/ui/Input";
+import { AddressBook, type Address } from "@/components/account/AddressBook";
 
 export default function CheckoutPage() {
   const { items, subtotal, loading: cartLoading } = useCart();
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [selected, setSelected] = useState<Address | null>(null);
+  const [profilePrefill, setProfilePrefill] = useState<{ full_name?: string; phone?: string }>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -24,16 +23,14 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Pre-fill from the user's saved profile, if they've set one.
+      // Used only to prefill the "add new address" form the first time.
       const { data: profile } = await supabase
         .from("profiles")
         .select("full_name, phone")
         .eq("id", data.user.id)
         .single();
 
-      if (profile?.full_name) setName(profile.full_name);
-      if (profile?.phone) setPhone(profile.phone);
-
+      setProfilePrefill({ full_name: profile?.full_name ?? undefined, phone: profile?.phone ?? undefined });
       setCheckingAuth(false);
     });
   }, [router]);
@@ -56,7 +53,7 @@ export default function CheckoutPage() {
     );
   }
 
-  const shippingComplete = name.trim() && phone.trim() && address.trim();
+  const shippingComplete = Boolean(selected);
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -66,39 +63,12 @@ export default function CheckoutPage() {
         <h2 className="mb-4 text-sm font-semibold text-slate-700">
           Shipping Address
         </h2>
-        <div className="flex flex-col gap-4">
-          <div>
-            <Label htmlFor="shipping-name">Full Name</Label>
-            <Input
-              id="shipping-name"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="shipping-phone">Phone Number</Label>
-            <Input
-              id="shipping-phone"
-              type="tel"
-              required
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="shipping-address">
-              Delivery Address (street, city, state, PIN code)
-            </Label>
-            <Textarea
-              id="shipping-address"
-              rows={3}
-              required
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-          </div>
-        </div>
+        <AddressBook
+          selectable
+          selectedId={selected?.id ?? null}
+          onSelect={setSelected}
+          prefill={profilePrefill}
+        />
       </div>
 
       <div className="mt-6 rounded-2xl border border-slate-100 p-6">
@@ -142,7 +112,11 @@ export default function CheckoutPage() {
 
       <div className="mt-4">
         <RazorpayButton
-          shippingInfo={{ name, phone, address }}
+          shippingInfo={{
+            name: selected?.full_name ?? "",
+            phone: selected?.phone ?? "",
+            address: selected?.address_line ?? "",
+          }}
           disabled={!shippingComplete}
         />
       </div>

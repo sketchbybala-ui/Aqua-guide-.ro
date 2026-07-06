@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { ProductGrid } from "@/components/product/ProductGrid";
-import type { Product } from "@/lib/types";
+import type { Product, RatingSummary } from "@/lib/types";
 
 type FeaturedProduct = Product & { category?: { name: string } };
 
 export function FeaturedProducts({
   products,
+  ratings,
 }: {
   products: FeaturedProduct[];
+  ratings?: Record<string, RatingSummary>;
 }) {
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -19,7 +21,7 @@ export function FeaturedProducts({
           Pure Water Solutions for Every Need
         </h2>
       </div>
-      <ProductGrid products={products} categoryLabel="Featured" />
+      <ProductGrid products={products} categoryLabel="Featured" ratings={ratings} />
       <div className="mt-10 text-center">
         <Link
           href="/home-use"

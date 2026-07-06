@@ -73,3 +73,19 @@ export interface OrderItem {
 export interface ProductWithCategory extends Product {
   category: Pick<Category, "slug" | "name">;
 }
+
+export interface Review {
+  id: string;
+  product_id: string;
+  user_id: string;
+  reviewer_name: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RatingSummary {
+  avg_rating: number;
+  review_count: number;
+}

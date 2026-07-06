@@ -37,12 +37,20 @@ export default async function AccountPage() {
         </p>
       </div>
 
-      <Link
-        href="/account/orders"
-        className="mt-6 inline-block text-sm font-medium text-brand-600 hover:text-brand-700"
-      >
-        View Order History &rarr;
-      </Link>
+      <div className="mt-6 flex flex-col gap-2">
+        <Link
+          href="/account/orders"
+          className="text-sm font-medium text-brand-600 hover:text-brand-700"
+        >
+          View Order History &rarr;
+        </Link>
+        <Link
+          href="/account/addresses"
+          className="text-sm font-medium text-brand-600 hover:text-brand-700"
+        >
+          Manage Saved Addresses &rarr;
+        </Link>
+      </div>
     </section>
   );
 }

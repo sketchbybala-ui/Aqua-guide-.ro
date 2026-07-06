@@ -192,6 +192,102 @@ create policy "order_items_admin_select_all"
   using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin));
 
 -- ============================================================================
+-- ADDRESSES
+-- Multiple saved shipping addresses per user. Fully owner-scoped, same
+-- pattern as cart_items — a user can only ever see/write their own rows.
+-- ============================================================================
+create table public.addresses (
+  id            uuid primary key default gen_random_uuid(),
+  user_id       uuid not null references auth.users(id) on delete cascade,
+  label         text not null default 'Home',
+  full_name     text not null,
+  phone         text not null,
+  address_line  text not null,
+  is_default    boolean not null default false,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now()
+);
+
+create index addresses_user_id_idx on public.addresses(user_id);
+
+-- Only one default address per user.
+create unique index addresses_one_default_per_user
+  on public.addresses(user_id)
+  where is_default;
+
+alter table public.addresses enable row level security;
+
+create policy "addresses_select_own"
+  on public.addresses for select
+  using (auth.uid() = user_id);
+
+create policy "addresses_insert_own"
+  on public.addresses for insert
+  with check (auth.uid() = user_id);
+
+create policy "addresses_update_own"
+  on public.addresses for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "addresses_delete_own"
+  on public.addresses for delete
+  using (auth.uid() = user_id);
+
+-- ============================================================================
+-- REVIEWS
+-- One review per user per product. Publicly readable so anyone browsing
+-- can see ratings; writable only by the review's own author. reviewer_name
+-- is a snapshot (same pattern as order_items snapshotting product_name) so
+-- showing a review never needs to read another user's profile row, which
+-- profiles' RLS doesn't allow anyway.
+-- ============================================================================
+create table public.reviews (
+  id            uuid primary key default gen_random_uuid(),
+  product_id    uuid not null references public.products(id) on delete cascade,
+  user_id       uuid not null references auth.users(id) on delete cascade,
+  reviewer_name text not null,
+  rating        smallint not null check (rating between 1 and 5),
+  comment       text,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now(),
+  unique (product_id, user_id)
+);
+
+create index reviews_product_id_idx on public.reviews(product_id);
+
+alter table public.reviews enable row level security;
+
+create policy "reviews_select_all"
+  on public.reviews for select
+  using (true);
+
+create policy "reviews_insert_own"
+  on public.reviews for insert
+  with check (auth.uid() = user_id);
+
+create policy "reviews_update_own"
+  on public.reviews for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "reviews_delete_own"
+  on public.reviews for delete
+  using (auth.uid() = user_id);
+
+-- Cheap per-product aggregate, exposed automatically via PostgREST like any
+-- other table/view. Queried separately (one query for many product ids)
+-- rather than embedded, since PostgREST embedding needs a declared FK
+-- relationship, which a view doesn't have.
+create view public.product_rating_summary as
+  select
+    product_id,
+    round(avg(rating)::numeric, 1) as avg_rating,
+    count(*)::int as review_count
+  from public.reviews
+  group by product_id;
+
+-- ============================================================================
 -- TRIGGERS
 -- ============================================================================
 
@@ -213,6 +309,10 @@ create trigger set_updated_at before update on public.products
 create trigger set_updated_at before update on public.cart_items
   for each row execute function public.set_updated_at();
 create trigger set_updated_at before update on public.orders
+  for each row execute function public.set_updated_at();
+create trigger set_updated_at before update on public.addresses
+  for each row execute function public.set_updated_at();
+create trigger set_updated_at before update on public.reviews
   for each row execute function public.set_updated_at();
 
 -- Auto-create a profile row whenever a new auth.users row appears.

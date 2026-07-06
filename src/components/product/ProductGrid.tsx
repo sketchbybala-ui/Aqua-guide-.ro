@@ -1,14 +1,16 @@
 import { ProductCard } from "./ProductCard";
-import type { Product } from "@/lib/types";
+import type { Product, RatingSummary } from "@/lib/types";
 
 type GridProduct = Product & { category?: { name: string } };
 
 export function ProductGrid({
   products,
   categoryLabel,
+  ratings,
 }: {
   products: GridProduct[];
   categoryLabel: string;
+  ratings?: Record<string, RatingSummary>;
 }) {
   if (products.length === 0) {
     return (
@@ -25,6 +27,7 @@ export function ProductGrid({
           key={product.id}
           product={product}
           categoryLabel={categoryLabel}
+          rating={ratings?.[product.id]}
         />
       ))}
     </div>

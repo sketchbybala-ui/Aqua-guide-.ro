@@ -5,16 +5,19 @@ import Link from "next/link";
 import { useCart } from "@/lib/cart/cart-context";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { Badge } from "@/components/ui/Badge";
-import type { Product } from "@/lib/types";
+import { StarRating } from "@/components/ui/StarRating";
+import type { Product, RatingSummary } from "@/lib/types";
 
 type ProductCardData = Product & { category?: { name: string } };
 
 export function ProductCard({
   product,
   categoryLabel,
+  rating,
 }: {
   product: ProductCardData;
   categoryLabel: string;
+  rating?: RatingSummary;
 }) {
   const label = product.category?.name ?? categoryLabel;
   const { addItem } = useCart();
@@ -43,6 +46,12 @@ export function ProductCard({
         >
           {product.name}
         </Link>
+        {rating && rating.review_count > 0 && (
+          <div className="flex items-center gap-1.5">
+            <StarRating rating={rating.avg_rating} size={13} />
+            <span className="text-xs text-slate-400">({rating.review_count})</span>
+          </div>
+        )}
         <div className="mt-auto flex items-center justify-between pt-2">
           <PriceTag amount={product.price} />
           <button

@@ -1,7 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { getActiveProductsByCategory } from "@/lib/products";
+import { getRatingSummaries } from "@/lib/reviews";
 import { Hero } from "@/components/home/Hero";
 import { StatsBar } from "@/components/home/StatsBar";
+import { CategoryButtons } from "@/components/home/CategoryButtons";
 import { ProductShowcase } from "@/components/home/ProductShowcase";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
@@ -52,17 +54,26 @@ export default async function HomePage() {
     showcaseRaw?.find((p) => p.slug === slug)
   ).filter((p): p is NonNullable<typeof p> => !!p);
 
+  const allIds = [
+    ...(featured ?? []).map((p) => p.id),
+    ...homeUse.map((p) => p.id),
+    ...commercial.map((p) => p.id),
+  ];
+  const ratings = await getRatingSummaries(allIds);
+
   return (
     <>
       <Hero heroImageUrl={HERO_IMAGE_URL} />
       <StatsBar />
+      <CategoryButtons />
       <ProductShowcase products={showcase} />
-      <FeaturedProducts products={featured ?? []} />
+      <FeaturedProducts products={featured ?? []} ratings={ratings} />
       <CategorySection
         title="Home Use"
         description="Compact RO purifiers designed for kitchens and apartments."
         viewAllHref="/home-use"
         products={homeUse}
+        ratings={ratings}
       />
       <CategorySection
         title="Commercial Use"
@@ -70,6 +81,7 @@ export default async function HomePage() {
         viewAllHref="/commercial"
         products={commercial}
         tone="tint"
+        ratings={ratings}
       />
       <WhyChooseUs />
       <CtaBanner />

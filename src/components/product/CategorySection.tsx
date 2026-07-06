@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ProductGrid } from "./ProductGrid";
-import type { Product } from "@/lib/types";
+import type { Product, RatingSummary } from "@/lib/types";
 
 export function CategorySection({
   title,
@@ -8,12 +8,14 @@ export function CategorySection({
   viewAllHref,
   products,
   tone = "white",
+  ratings,
 }: {
   title: string;
   description?: string;
   viewAllHref: string;
   products: Product[];
   tone?: "white" | "tint";
+  ratings?: Record<string, RatingSummary>;
 }) {
   return (
     <section className={tone === "tint" ? "bg-brand-50" : "bg-white"}>
@@ -32,7 +34,7 @@ export function CategorySection({
             View all &rarr;
           </Link>
         </div>
-        <ProductGrid products={products} categoryLabel={title} />
+        <ProductGrid products={products} categoryLabel={title} ratings={ratings} />
       </div>
     </section>
   );
