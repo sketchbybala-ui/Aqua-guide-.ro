@@ -4,12 +4,14 @@ import { useCart } from "@/lib/cart/cart-context";
 import { CartLineItem } from "@/components/cart/CartLineItem";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { LinkButton } from "@/components/ui/Button";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function CartPage() {
   const { items, subtotal, loading } = useCart();
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+      <BackButton fallbackHref="/" />
       <h1 className="mb-8 text-2xl font-semibold text-slate-900">
         Your Cart
       </h1>

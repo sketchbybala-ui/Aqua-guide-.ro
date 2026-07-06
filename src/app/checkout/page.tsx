@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cart/cart-context";
 import { formatINR } from "@/lib/format";
 import { RazorpayButton } from "@/components/checkout/RazorpayButton";
 import { AddressBook, type Address } from "@/components/account/AddressBook";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function CheckoutPage() {
   const { items, subtotal, loading: cartLoading } = useCart();
@@ -57,6 +58,7 @@ export default function CheckoutPage() {
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <BackButton fallbackHref="/cart" />
       <h1 className="mb-8 text-2xl font-semibold text-slate-900">Checkout</h1>
 
       <div className="rounded-2xl border border-slate-100 p-6">

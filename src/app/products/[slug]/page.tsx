@@ -6,6 +6,7 @@ import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductInfo } from "@/components/product/ProductInfo";
 import { ReviewForm } from "@/components/product/ReviewForm";
 import { ReviewList } from "@/components/product/ReviewList";
+import { BackButton } from "@/components/ui/BackButton";
 
 // Reads from Supabase on every request — never statically prerendered.
 export const dynamic = "force-dynamic";
@@ -39,6 +40,7 @@ export default async function ProductPage({
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+      <BackButton fallbackHref={`/${product.category?.slug ?? "home-use"}`} />
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <ProductGallery imageUrl={product.image_url} alt={product.name} />
         <ProductInfo

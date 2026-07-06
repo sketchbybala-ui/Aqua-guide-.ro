@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatINR } from "@/lib/format";
 import { Badge } from "@/components/ui/Badge";
+import { BackButton } from "@/components/ui/BackButton";
 
 // Reads the logged-in user's session — never statically prerendered.
 export const dynamic = "force-dynamic";
@@ -19,6 +20,7 @@ export default async function OrderHistoryPage() {
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <BackButton fallbackHref="/account" />
       <h1 className="mb-8 text-2xl font-semibold text-slate-900">
         Order History
       </h1>
