@@ -43,7 +43,7 @@ const PRODUCTS: NewProduct[] = [
   {
     slug: "aquafresh",
     name: "Aquafresh",
-    price: 7000,
+    price: 5000,
     description:
       "A 5-stage RO water purifier — sediment, pre-carbon, post-carbon, RO membrane, and post-carbon polishing — backed by a 100% Pure quality badge for safe, great-tasting drinking water.",
     file: "WhatsApp Image 2026-07-06 at 5.49.40 PM.jpeg",
