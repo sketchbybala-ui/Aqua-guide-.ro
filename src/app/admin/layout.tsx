@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
+import { AdminNav } from "@/components/admin/AdminNav";
 
 // Reads the logged-in user's session on every request — applies to this
 // whole route subtree, so no admin page is ever statically prerendered.
@@ -18,18 +18,9 @@ export default async function AdminLayout({
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-slate-900">
-          Admin &middot; Products
-        </h1>
-        <Link
-          href="/admin/products/new"
-          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
-        >
-          + Add Product
-        </Link>
-      </div>
-      {children}
+      <h1 className="mb-6 text-2xl font-semibold text-slate-900">Admin</h1>
+      <AdminNav />
+      <div className="mt-8">{children}</div>
     </section>
   );
 }
