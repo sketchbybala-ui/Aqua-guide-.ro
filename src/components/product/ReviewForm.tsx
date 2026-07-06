@@ -200,15 +200,15 @@ export function ReviewForm({
 
       <div>
         <Label htmlFor="review-images">Photos (optional)</Label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3">
           {images.map((url) => (
-            <div key={url} className="group relative h-16 w-16 overflow-hidden rounded-lg border border-slate-200">
-              <Image src={url} alt="" fill sizes="64px" className="object-cover" />
+            <div key={url} className="group relative h-28 w-28 overflow-hidden rounded-lg border border-slate-200">
+              <Image src={url} alt="" fill sizes="112px" className="object-cover" />
               <button
                 type="button"
                 onClick={() => removeImage(url)}
                 aria-label="Remove photo"
-                className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-bl bg-black/60 text-xs text-white opacity-0 group-hover:opacity-100"
+                className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-sm text-white opacity-0 group-hover:opacity-100"
               >
                 &times;
               </button>
@@ -219,7 +219,7 @@ export function ReviewForm({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-300 text-xs text-slate-400 hover:border-brand-400 hover:text-brand-600 disabled:opacity-50"
+              className="flex h-28 w-28 items-center justify-center rounded-lg border border-dashed border-slate-300 text-sm text-slate-400 hover:border-brand-400 hover:text-brand-600 disabled:opacity-50"
             >
               {uploading ? "…" : "+ Add"}
             </button>
