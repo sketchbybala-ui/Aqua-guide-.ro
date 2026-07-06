@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export function ProfileMenu() {
-  const [user, setUser] = useState<{ email: string | null; name: string | null } | null>(null);
+  const [user, setUser] = useState<{
+    email: string | null;
+    name: string | null;
+    isAdmin: boolean;
+  } | null>(null);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -17,10 +21,10 @@ export function ProfileMenu() {
     async function loadUser(userId: string, email: string | null) {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("full_name")
+        .select("full_name, is_admin")
         .eq("id", userId)
         .single();
-      setUser({ email, name: profile?.full_name ?? null });
+      setUser({ email, name: profile?.full_name ?? null, isAdmin: profile?.is_admin ?? false });
     }
 
     supabase.auth.getUser().then(({ data }) => {
@@ -98,6 +102,15 @@ export function ProfileMenu() {
           >
             Order History
           </Link>
+          {user.isAdmin && (
+            <Link
+              href="/admin"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-600"
+            >
+              Admin
+            </Link>
+          )}
           <button
             onClick={handleLogout}
             className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
