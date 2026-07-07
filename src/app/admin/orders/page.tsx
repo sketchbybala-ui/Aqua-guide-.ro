@@ -61,11 +61,13 @@ export default async function AdminOrdersPage({
 
   // Search by order id (the short #xxxxxxxx code or a full UUID) or by the
   // customer's name — matched case-insensitively over the filtered set.
-  const needle = search.toLowerCase();
+  // Strip a leading "#" so pasting the displayed "#xxxxxxxx" code still
+  // matches the actual UUID (which has no "#").
+  const needle = search.toLowerCase().replace(/^#/, "");
   const orders = search
     ? (rawOrders ?? []).filter(
         (o) =>
-          o.id.toLowerCase().includes(needle) ||
+          o.id.toLowerCase().replace(/-/g, "").includes(needle.replace(/-/g, "")) ||
           (o.shipping_name ?? "").toLowerCase().includes(needle)
       )
     : rawOrders;
