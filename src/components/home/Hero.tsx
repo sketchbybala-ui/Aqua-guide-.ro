@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { LinkButton } from "@/components/ui/Button";
+import { Bubbles } from "./Bubbles";
 
 const WHATSAPP_DEMO_LINK =
   "https://wa.me/919489368104?text=" +
@@ -33,6 +34,7 @@ export function Hero({ heroImageUrl }: { heroImageUrl: string | null }) {
           </defs>
           <rect width="100%" height="100%" fill="url(#hero-dots)" />
         </svg>
+        <Bubbles />
       </div>
 
       <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 pb-24 pt-16 sm:px-6 lg:grid-cols-2">

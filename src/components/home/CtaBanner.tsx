@@ -1,3 +1,5 @@
+import { Bubbles } from "./Bubbles";
+
 const WHATSAPP_QUOTE_LINK =
   "https://wa.me/919489368104?text=" +
   encodeURIComponent("Hi Aqua Guide, I'd like a quote for a water purifier.");
@@ -11,6 +13,7 @@ export function CtaBanner() {
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-600 to-brand-700 px-8 py-12 sm:px-14">
         <div className="pointer-events-none absolute -right-10 -top-10 h-52 w-52 rounded-full bg-white/10 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-16 right-24 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
+        <Bubbles tone="onBlue" />
 
         <div className="relative flex flex-col items-start gap-5">
           <h2 className="max-w-lg text-2xl font-bold text-white sm:text-3xl">
