@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { LinkButton } from "@/components/ui/Button";
 import { Bubbles } from "./Bubbles";
+import { AnimatedWaves } from "./AnimatedWaves";
 
 const WHATSAPP_DEMO_LINK =
   "https://wa.me/919489368104?text=" +
@@ -107,18 +108,10 @@ export function Hero({ heroImageUrl }: { heroImageUrl: string | null }) {
         </div>
       </div>
 
-      {/* wave divider flowing into the stats bar below */}
-      <svg
-        className="relative block w-full text-brand-900"
-        viewBox="0 0 1440 80"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M0 40c120 24 240 24 360 8s240-24 360-8 240 24 360 8 240-24 360-8v40H0Z"
-          fill="currentColor"
-        />
-      </svg>
+      {/* animated waves flowing into the stats bar below */}
+      <div className="relative">
+        <AnimatedWaves color="#102a63" height={100} />
+      </div>
     </section>
   );
 }

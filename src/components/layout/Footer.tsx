@@ -1,21 +1,12 @@
 import Link from "next/link";
 import { LogoMark } from "./Logo";
+import { AnimatedWaves } from "@/components/home/AnimatedWaves";
 
 export function Footer() {
   return (
-    <footer className="mt-24 bg-brand-900">
-      {/* wave divider: the white page above dips into the dark footer */}
-      <svg
-        className="block w-full text-white"
-        viewBox="0 0 1440 80"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M0 40c120 24 240 24 360 8s240-24 360-8 240 24 360 8 240-24 360-8V0H0Z"
-          fill="currentColor"
-        />
-      </svg>
+    <footer className="bg-brand-900">
+      {/* animated wave divider: the white page above flows into the footer */}
+      <AnimatedWaves color="#ffffff" flip height={80} />
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
           <div>

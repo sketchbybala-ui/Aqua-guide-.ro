@@ -76,7 +76,7 @@ body {
     transform: translate(10px, -300px) scale(1);
   }
   90% {
-    opacity: 0.5;
+    opacity: 0.7;
   }
   100% {
     transform: translate(-8px, -620px) scale(1.12);
@@ -87,10 +87,50 @@ body {
   animation: bubble-rise 10s linear infinite;
 }
 
+/* Endlessly flowing wave: the SVG holds two seamless copies side by side,
+   so sliding it left by exactly half its width loops with no visible seam. */
+@keyframes wave-flow {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-wave-slow {
+  animation: wave-flow 14s linear infinite;
+}
+.animate-wave-med {
+  animation: wave-flow 9s linear infinite;
+}
+.animate-wave-fast {
+  animation: wave-flow 6s linear infinite;
+}
+
+/* Soft caustic light shimmer drifting across the hero. */
+@keyframes shimmer-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(30px, 20px);
+    opacity: 0.85;
+  }
+}
+.animate-shimmer {
+  animation: shimmer-drift 9s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-bubble,
   .animate-float,
-  .animate-offer-glow {
+  .animate-offer-glow,
+  .animate-wave-slow,
+  .animate-wave-med,
+  .animate-wave-fast,
+  .animate-shimmer {
     animation: none;
   }
 }
