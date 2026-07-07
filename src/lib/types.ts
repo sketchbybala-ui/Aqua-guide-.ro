@@ -62,6 +62,7 @@ export interface Order {
   razorpay_payment_id: string | null;
   razorpay_refund_id: string | null;
   refunded_at: string | null;
+  refund_requested_at: string | null;
   shipping_name: string | null;
   shipping_phone: string | null;
   shipping_address: string | null;

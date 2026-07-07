@@ -143,6 +143,9 @@ create table public.orders (
   razorpay_signature  text,
   razorpay_refund_id  text,
   refunded_at         timestamptz,
+  -- set when the customer requests a refund; the admin then approves it,
+  -- which issues the actual Razorpay refund and sets refunded_at.
+  refund_requested_at timestamptz,
   shipping_name       text,
   shipping_phone      text,
   shipping_address    text,

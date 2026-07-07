@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatINR } from "@/lib/format";
 import { Badge } from "@/components/ui/Badge";
 import { BackButton } from "@/components/ui/BackButton";
+import { RefundRequestButton } from "@/components/account/RefundRequestButton";
 
 // Reads the logged-in user's session — never statically prerendered.
 export const dynamic = "force-dynamic";
@@ -73,6 +74,31 @@ export default async function OrderDetailPage({
           </p>
         </div>
       )}
+
+      {/* Refund: request button (paid + not yet requested), pending notice,
+          or a confirmation once the admin has processed it. */}
+      <div className="mt-6">
+        {order.status === "refunded" ? (
+          <div className="rounded-2xl border border-green-100 bg-green-50 p-4 text-sm text-green-700">
+            This order has been refunded
+            {order.refunded_at &&
+              ` on ${new Date(order.refunded_at).toLocaleDateString("en-IN", {
+                dateStyle: "long",
+              })}`}
+            . The amount has been returned to your original payment method.
+          </div>
+        ) : order.refund_requested_at ? (
+          <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-700">
+            Refund requested on{" "}
+            {new Date(order.refund_requested_at).toLocaleDateString("en-IN", {
+              dateStyle: "long",
+            })}
+            . Our team is reviewing your request.
+          </div>
+        ) : order.status === "paid" ? (
+          <RefundRequestButton orderId={order.id} />
+        ) : null}
+      </div>
 
       <p className="mt-6 text-xs text-slate-400">
         Placed on{" "}

@@ -42,6 +42,16 @@ export default async function AdminOrderDetailPage({
         </div>
       </div>
 
+      {order.refund_requested_at && order.status === "paid" && (
+        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <strong>Refund requested</strong> by the customer on{" "}
+          {new Date(order.refund_requested_at).toLocaleDateString("en-IN", {
+            dateStyle: "long",
+          })}
+          . Review and use <em>Issue Full Refund</em> below to process it.
+        </div>
+      )}
+
       <div className="divide-y divide-slate-100 rounded-2xl border border-slate-100">
         {(items ?? []).map((item) => (
           <div key={item.id} className="flex items-center justify-between p-4 text-sm">

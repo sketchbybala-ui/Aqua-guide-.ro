@@ -50,7 +50,7 @@ export default async function AdminOrdersPage({
     (() => {
       let query = supabase
         .from("orders")
-        .select("id, status, payment_method, total_amount, shipping_name, shipping_phone, razorpay_payment_id, created_at")
+        .select("id, status, payment_method, total_amount, shipping_name, shipping_phone, razorpay_payment_id, refund_requested_at, created_at")
         .order("created_at", { ascending: false });
       if (activeStatus !== "all") query = query.eq("status", activeStatus);
       if (activeMethod !== "all") query = query.eq("payment_method", activeMethod);
@@ -183,6 +183,11 @@ export default async function AdminOrdersPage({
                   </td>
                   <td className="px-4 py-3">
                     <Badge>{order.status}</Badge>
+                    {order.refund_requested_at && order.status === "paid" && (
+                      <span className="mt-1 block text-xs font-medium text-amber-600">
+                        Refund requested
+                      </span>
+                    )}
                   </td>
                   {activeStatus === "paid" && (
                     <td className="px-4 py-3 text-xs text-slate-500">
