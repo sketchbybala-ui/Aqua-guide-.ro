@@ -23,12 +23,13 @@ const METHOD_TABS: { value: string; label: string }[] = [
   { value: "cod", label: "Cash on Delivery" },
 ];
 
-// Builds an /admin/orders href that keeps whichever filter isn't being
-// changed, so status and payment-method filters combine.
-function filterHref(status: string, method: string) {
+// Builds an /admin/orders href that keeps whichever filters aren't being
+// changed, so status, payment-method, and search all combine.
+function filterHref(status: string, method: string, q: string) {
   const params = new URLSearchParams();
   if (status !== "all") params.set("status", status);
   if (method !== "all") params.set("method", method);
+  if (q) params.set("q", q);
   const qs = params.toString();
   return qs ? `/admin/orders?${qs}` : "/admin/orders";
 }
@@ -36,15 +37,16 @@ function filterHref(status: string, method: string) {
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; method?: string }>;
+  searchParams: Promise<{ status?: string; method?: string; q?: string }>;
 }) {
-  const { status, method } = await searchParams;
+  const { status, method, q } = await searchParams;
   const activeStatus = status && status !== "all" ? status : "all";
   const activeMethod = method === "online" || method === "cod" ? method : "all";
+  const search = (q ?? "").trim();
 
   const supabase = await createClient();
 
-  const [{ data: orders }, { data: allOrders }] = await Promise.all([
+  const [{ data: rawOrders }, { data: allOrders }] = await Promise.all([
     (() => {
       let query = supabase
         .from("orders")
@@ -57,6 +59,17 @@ export default async function AdminOrdersPage({
     supabase.from("orders").select("status, payment_method"),
   ]);
 
+  // Search by order id (the short #xxxxxxxx code or a full UUID) or by the
+  // customer's name — matched case-insensitively over the filtered set.
+  const needle = search.toLowerCase();
+  const orders = search
+    ? (rawOrders ?? []).filter(
+        (o) =>
+          o.id.toLowerCase().includes(needle) ||
+          (o.shipping_name ?? "").toLowerCase().includes(needle)
+      )
+    : rawOrders;
+
   const counts: Record<string, number> = { all: allOrders?.length ?? 0 };
   const methodCounts: Record<string, number> = { all: allOrders?.length ?? 0 };
   for (const row of allOrders ?? []) {
@@ -66,11 +79,37 @@ export default async function AdminOrdersPage({
 
   return (
     <div>
+      <form method="get" className="mb-4 flex gap-2">
+        <input type="hidden" name="status" value={activeStatus} />
+        <input type="hidden" name="method" value={activeMethod} />
+        <input
+          type="search"
+          name="q"
+          defaultValue={search}
+          placeholder="Search by order ID or customer name…"
+          className="w-full max-w-sm rounded-lg border border-slate-300 px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline focus:outline-2 focus:outline-brand-100"
+        />
+        <button
+          type="submit"
+          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+        >
+          Search
+        </button>
+        {search && (
+          <Link
+            href={filterHref(activeStatus, activeMethod, "")}
+            className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-700"
+          >
+            Clear
+          </Link>
+        )}
+      </form>
+
       <div className="mb-4 flex flex-wrap gap-2">
         {STATUS_TABS.map((tab) => (
           <Link
             key={tab.value}
-            href={filterHref(tab.value, activeMethod)}
+            href={filterHref(tab.value, activeMethod, search)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium ${
               activeStatus === tab.value
                 ? "bg-brand-600 text-white"
@@ -89,7 +128,7 @@ export default async function AdminOrdersPage({
         {METHOD_TABS.map((tab) => (
           <Link
             key={tab.value}
-            href={filterHref(activeStatus, tab.value)}
+            href={filterHref(activeStatus, tab.value, search)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium ${
               activeMethod === tab.value
                 ? "bg-brand-600 text-white"
@@ -102,7 +141,11 @@ export default async function AdminOrdersPage({
       </div>
 
       {!orders || orders.length === 0 ? (
-        <p className="text-sm text-slate-500">No orders match this filter.</p>
+        <p className="text-sm text-slate-500">
+          {search
+            ? `No orders match "${search}".`
+            : "No orders match this filter."}
+        </p>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-slate-100">
           <table className="w-full min-w-[720px] text-left text-sm">
