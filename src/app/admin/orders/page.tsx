@@ -17,40 +17,60 @@ const STATUS_TABS: { value: OrderStatus | "all"; label: string }[] = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
+const METHOD_TABS: { value: string; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "online", label: "Online" },
+  { value: "cod", label: "Cash on Delivery" },
+];
+
+// Builds an /admin/orders href that keeps whichever filter isn't being
+// changed, so status and payment-method filters combine.
+function filterHref(status: string, method: string) {
+  const params = new URLSearchParams();
+  if (status !== "all") params.set("status", status);
+  if (method !== "all") params.set("method", method);
+  const qs = params.toString();
+  return qs ? `/admin/orders?${qs}` : "/admin/orders";
+}
+
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; method?: string }>;
 }) {
-  const { status } = await searchParams;
+  const { status, method } = await searchParams;
   const activeStatus = status && status !== "all" ? status : "all";
+  const activeMethod = method === "online" || method === "cod" ? method : "all";
 
   const supabase = await createClient();
 
-  const [{ data: orders }, { data: allStatuses }] = await Promise.all([
+  const [{ data: orders }, { data: allOrders }] = await Promise.all([
     (() => {
       let query = supabase
         .from("orders")
         .select("id, status, payment_method, total_amount, shipping_name, shipping_phone, razorpay_payment_id, created_at")
         .order("created_at", { ascending: false });
       if (activeStatus !== "all") query = query.eq("status", activeStatus);
+      if (activeMethod !== "all") query = query.eq("payment_method", activeMethod);
       return query;
     })(),
-    supabase.from("orders").select("status"),
+    supabase.from("orders").select("status, payment_method"),
   ]);
 
-  const counts: Record<string, number> = { all: allStatuses?.length ?? 0 };
-  for (const row of allStatuses ?? []) {
+  const counts: Record<string, number> = { all: allOrders?.length ?? 0 };
+  const methodCounts: Record<string, number> = { all: allOrders?.length ?? 0 };
+  for (const row of allOrders ?? []) {
     counts[row.status] = (counts[row.status] ?? 0) + 1;
+    methodCounts[row.payment_method] = (methodCounts[row.payment_method] ?? 0) + 1;
   }
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap gap-2">
         {STATUS_TABS.map((tab) => (
           <Link
             key={tab.value}
-            href={tab.value === "all" ? "/admin/orders" : `/admin/orders?status=${tab.value}`}
+            href={filterHref(tab.value, activeMethod)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium ${
               activeStatus === tab.value
                 ? "bg-brand-600 text-white"
@@ -62,10 +82,27 @@ export default async function AdminOrdersPage({
         ))}
       </div>
 
+      <div className="mb-6 flex flex-wrap items-center gap-2">
+        <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
+          Payment
+        </span>
+        {METHOD_TABS.map((tab) => (
+          <Link
+            key={tab.value}
+            href={filterHref(activeStatus, tab.value)}
+            className={`rounded-full px-3.5 py-1.5 text-sm font-medium ${
+              activeMethod === tab.value
+                ? "bg-brand-600 text-white"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            }`}
+          >
+            {tab.label} ({methodCounts[tab.value] ?? 0})
+          </Link>
+        ))}
+      </div>
+
       {!orders || orders.length === 0 ? (
-        <p className="text-sm text-slate-500">
-          {activeStatus === "all" ? "No orders yet." : `No ${activeStatus} orders.`}
-        </p>
+        <p className="text-sm text-slate-500">No orders match this filter.</p>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-slate-100">
           <table className="w-full min-w-[720px] text-left text-sm">
