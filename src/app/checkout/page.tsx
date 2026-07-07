@@ -6,13 +6,16 @@ import { createClient } from "@/lib/supabase/client";
 import { useCart } from "@/lib/cart/cart-context";
 import { formatINR } from "@/lib/format";
 import { RazorpayButton } from "@/components/checkout/RazorpayButton";
+import { CodButton } from "@/components/checkout/CodButton";
 import { AddressBook, type Address } from "@/components/account/AddressBook";
 import { BackButton } from "@/components/ui/BackButton";
+import type { PaymentMethod } from "@/lib/types";
 
 export default function CheckoutPage() {
   const { items, subtotal, loading: cartLoading } = useCart();
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [selected, setSelected] = useState<Address | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
   const [profilePrefill, setProfilePrefill] = useState<{ full_name?: string; phone?: string }>({});
   const router = useRouter();
 
@@ -100,10 +103,66 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <p className="mt-6 text-xs text-slate-400">
-        Test mode — no real payment will be captured. Use Razorpay&apos;s
-        published test card numbers at checkout.
-      </p>
+      <div className="mt-6 rounded-2xl border border-slate-100 p-6">
+        <h2 className="mb-4 text-sm font-semibold text-slate-700">
+          Payment Method
+        </h2>
+        <div className="flex flex-col gap-3">
+          <label
+            className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 ${
+              paymentMethod === "online"
+                ? "border-brand-500 ring-1 ring-brand-100"
+                : "border-slate-200"
+            }`}
+          >
+            <input
+              type="radio"
+              name="payment-method"
+              className="mt-1"
+              checked={paymentMethod === "online"}
+              onChange={() => setPaymentMethod("online")}
+            />
+            <span>
+              <span className="block text-sm font-medium text-slate-900">
+                Pay Online
+              </span>
+              <span className="block text-xs text-slate-500">
+                Card, UPI, netbanking or wallet via Razorpay — secure and instant.
+              </span>
+            </span>
+          </label>
+
+          <label
+            className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 ${
+              paymentMethod === "cod"
+                ? "border-brand-500 ring-1 ring-brand-100"
+                : "border-slate-200"
+            }`}
+          >
+            <input
+              type="radio"
+              name="payment-method"
+              className="mt-1"
+              checked={paymentMethod === "cod"}
+              onChange={() => setPaymentMethod("cod")}
+            />
+            <span>
+              <span className="block text-sm font-medium text-slate-900">
+                Cash on Delivery
+              </span>
+              <span className="block text-xs text-slate-500">
+                Pay in cash when your purifier is delivered and installed.
+              </span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      {paymentMethod === "online" && (
+        <p className="mt-6 text-xs text-slate-400">
+          Secure payment via Razorpay.
+        </p>
+      )}
 
       {!shippingComplete && (
         <p className="mt-4 text-sm text-amber-600">
@@ -113,14 +172,25 @@ export default function CheckoutPage() {
       )}
 
       <div className="mt-4">
-        <RazorpayButton
-          shippingInfo={{
-            name: selected?.full_name ?? "",
-            phone: selected?.phone ?? "",
-            address: selected?.address_line ?? "",
-          }}
-          disabled={!shippingComplete}
-        />
+        {paymentMethod === "online" ? (
+          <RazorpayButton
+            shippingInfo={{
+              name: selected?.full_name ?? "",
+              phone: selected?.phone ?? "",
+              address: selected?.address_line ?? "",
+            }}
+            disabled={!shippingComplete}
+          />
+        ) : (
+          <CodButton
+            shippingInfo={{
+              name: selected?.full_name ?? "",
+              phone: selected?.phone ?? "",
+              address: selected?.address_line ?? "",
+            }}
+            disabled={!shippingComplete}
+          />
+        )}
       </div>
     </section>
   );

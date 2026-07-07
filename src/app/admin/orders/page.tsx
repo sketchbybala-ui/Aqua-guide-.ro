@@ -11,7 +11,8 @@ export const dynamic = "force-dynamic";
 const STATUS_TABS: { value: OrderStatus | "all"; label: string }[] = [
   { value: "all", label: "All" },
   { value: "paid", label: "Paid" },
-  { value: "created", label: "Awaiting Payment" },
+  { value: "created", label: "Pending" },
+  { value: "refunded", label: "Refunded" },
   { value: "failed", label: "Failed" },
   { value: "cancelled", label: "Cancelled" },
 ];
@@ -30,7 +31,7 @@ export default async function AdminOrdersPage({
     (() => {
       let query = supabase
         .from("orders")
-        .select("id, status, total_amount, shipping_name, shipping_phone, razorpay_payment_id, created_at")
+        .select("id, status, payment_method, total_amount, shipping_name, shipping_phone, razorpay_payment_id, created_at")
         .order("created_at", { ascending: false });
       if (activeStatus !== "all") query = query.eq("status", activeStatus);
       return query;
@@ -73,6 +74,7 @@ export default async function AdminOrdersPage({
                 <th className="px-4 py-3">Order</th>
                 <th className="px-4 py-3">Customer</th>
                 <th className="px-4 py-3">Placed</th>
+                <th className="px-4 py-3">Payment</th>
                 <th className="px-4 py-3">Status</th>
                 {activeStatus === "paid" && <th className="px-4 py-3">Payment ID</th>}
                 <th className="px-4 py-3">Total</th>
@@ -93,6 +95,9 @@ export default async function AdminOrdersPage({
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {new Date(order.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-slate-500">
+                    {order.payment_method === "cod" ? "COD" : "Online"}
                   </td>
                   <td className="px-4 py-3">
                     <Badge>{order.status}</Badge>

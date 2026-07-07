@@ -128,17 +128,21 @@ create policy "cart_items_delete_own"
 -- Razorpay route handlers, which recompute the total from current product
 -- prices — a client can never insert an order with a self-chosen amount.
 -- ============================================================================
-create type public.order_status as enum ('created', 'paid', 'failed', 'cancelled');
+create type public.order_status as enum ('created', 'paid', 'failed', 'cancelled', 'refunded');
 
 create table public.orders (
   id                  uuid primary key default gen_random_uuid(),
   user_id             uuid not null references auth.users(id) on delete restrict,
   status              public.order_status not null default 'created',
+  -- 'online' = paid via Razorpay; 'cod' = cash on delivery (no online payment).
+  payment_method      text not null default 'online' check (payment_method in ('online', 'cod')),
   total_amount        numeric(12,2) not null check (total_amount >= 0),
   currency            text not null default 'INR',
   razorpay_order_id   text unique,
   razorpay_payment_id text,
   razorpay_signature  text,
+  razorpay_refund_id  text,
+  refunded_at         timestamptz,
   shipping_name       text,
   shipping_phone      text,
   shipping_address    text,

@@ -3,7 +3,14 @@
 // `npx supabase gen types typescript --project-id <ref> > src/types/supabase.ts`
 // — see SETUP.md.
 
-export type OrderStatus = "created" | "paid" | "failed" | "cancelled";
+export type OrderStatus =
+  | "created"
+  | "paid"
+  | "failed"
+  | "cancelled"
+  | "refunded";
+
+export type PaymentMethod = "online" | "cod";
 
 export interface Category {
   id: string;
@@ -48,10 +55,13 @@ export interface Order {
   id: string;
   user_id: string;
   status: OrderStatus;
+  payment_method: PaymentMethod;
   total_amount: number;
   currency: string;
   razorpay_order_id: string | null;
   razorpay_payment_id: string | null;
+  razorpay_refund_id: string | null;
+  refunded_at: string | null;
   shipping_name: string | null;
   shipping_phone: string | null;
   shipping_address: string | null;
