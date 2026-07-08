@@ -23,9 +23,11 @@ export type ShippingInfo = {
 
 export function RazorpayButton({
   shippingInfo,
+  couponCode,
   disabled = false,
 }: {
   shippingInfo: ShippingInfo;
+  couponCode?: string;
   disabled?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
@@ -44,6 +46,7 @@ export function RazorpayButton({
           shippingName: shippingInfo.name,
           shippingPhone: shippingInfo.phone,
           shippingAddress: shippingInfo.address,
+          couponCode,
         }),
       });
       const order = await createRes.json();

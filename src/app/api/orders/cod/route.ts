@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { validateCoupon, applyDiscount, recordCouponRedemptionIfAny } from "@/lib/coupons";
 
 // Places a Cash-on-Delivery order. Same authoritative-total logic as the
 // Razorpay create-order route (the amount is always recomputed here from
@@ -18,9 +19,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { shippingName, shippingPhone, shippingAddress } = await request
-    .json()
-    .catch(() => ({}));
+  const { shippingName, shippingPhone, shippingAddress, couponCode } =
+    await request.json().catch(() => ({}));
 
   if (!shippingName || !shippingPhone || !shippingAddress) {
     return NextResponse.json(
@@ -45,12 +45,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
   }
 
-  const totalAmount = validLines.reduce(
+  const subtotal = validLines.reduce(
     (sum, l) => sum + l.products!.price * l.quantity,
     0
   );
 
   const admin = createAdminClient();
+
+  let totalAmount = subtotal;
+  let discountAmount = 0;
+  let appliedCouponCode: string | null = null;
+
+  if (couponCode) {
+    const result = await validateCoupon(admin, couponCode, user.id);
+    if (!result.valid) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
+    }
+    totalAmount = applyDiscount(subtotal, result.discountPercent);
+    discountAmount = Math.round((subtotal - totalAmount) * 100) / 100;
+    appliedCouponCode = couponCode.trim().toUpperCase();
+  }
 
   const { data: order, error: orderError } = await admin
     .from("orders")
@@ -60,6 +74,8 @@ export async function POST(request: Request) {
       currency: "INR",
       payment_method: "cod",
       status: "created",
+      coupon_code: appliedCouponCode,
+      discount_amount: discountAmount,
       shipping_name: shippingName,
       shipping_phone: shippingPhone,
       shipping_address: shippingAddress,
@@ -89,6 +105,10 @@ export async function POST(request: Request) {
 
   // "Order received, pay on delivery" confirmation email.
   await sendOrderConfirmationEmail(order.id);
+
+  // COD has no separate payment step, so the coupon is "used" as soon as
+  // the order is placed.
+  await recordCouponRedemptionIfAny(admin, order.id);
 
   return NextResponse.json({ localOrderId: order.id });
 }

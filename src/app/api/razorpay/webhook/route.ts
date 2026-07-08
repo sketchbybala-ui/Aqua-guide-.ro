@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { recordCouponRedemptionIfAny } from "@/lib/coupons";
 
 // Razorpay calls this directly (no user session) whenever a payment's
 // status changes. This is the authoritative source of truth for order
@@ -51,7 +52,10 @@ export async function POST(request: Request) {
       .select("id")
       .eq("razorpay_order_id", razorpayOrderId)
       .maybeSingle();
-    if (order) await sendOrderConfirmationEmail(order.id);
+    if (order) {
+      await sendOrderConfirmationEmail(order.id);
+      await recordCouponRedemptionIfAny(admin, order.id);
+    }
   } else if (event.event === "payment.failed" && razorpayOrderId) {
     await admin
       .from("orders")

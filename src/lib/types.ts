@@ -63,6 +63,8 @@ export interface Order {
   razorpay_refund_id: string | null;
   refunded_at: string | null;
   refund_requested_at: string | null;
+  coupon_code: string | null;
+  discount_amount: number;
   shipping_name: string | null;
   shipping_phone: string | null;
   shipping_address: string | null;
@@ -100,4 +102,12 @@ export interface Review {
 export interface RatingSummary {
   avg_rating: number;
   review_count: number;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discount_percent: number;
+  is_active: boolean;
+  max_uses_per_user: number;
 }

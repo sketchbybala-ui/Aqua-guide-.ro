@@ -55,11 +55,21 @@ export default async function OrderDetailPage({
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-between rounded-2xl border border-slate-100 p-4">
-        <span className="font-semibold text-slate-900">Total</span>
-        <span className="text-lg font-semibold text-slate-900">
-          {formatINR(order.total_amount)}
-        </span>
+      <div className="mt-4 rounded-2xl border border-slate-100 p-4">
+        {order.coupon_code && (
+          <div className="mb-2 flex items-center justify-between text-sm text-green-700">
+            <span>
+              Coupon <span className="font-mono">{order.coupon_code}</span>
+            </span>
+            <span>&minus;{formatINR(order.discount_amount)}</span>
+          </div>
+        )}
+        <div className="flex items-center justify-between">
+          <span className="font-semibold text-slate-900">Total</span>
+          <span className="text-lg font-semibold text-slate-900">
+            {formatINR(order.total_amount)}
+          </span>
+        </div>
       </div>
 
       {order.shipping_address && (

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getActiveProductsByCategory } from "@/lib/products";
 import { getRatingSummaries } from "@/lib/reviews";
 import { Hero } from "@/components/home/Hero";
+import { WelcomeBonusBanner } from "@/components/home/WelcomeBonusBanner";
 import { StatsBar } from "@/components/home/StatsBar";
 import { CategoryButtons } from "@/components/home/CategoryButtons";
 import { ProductShowcase } from "@/components/home/ProductShowcase";
@@ -64,6 +65,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <WelcomeBonusBanner />
       <Hero heroImageUrl={HERO_IMAGE_URL} />
       <StatsBar />
       <CategoryButtons />

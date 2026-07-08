@@ -150,6 +150,10 @@ create table public.orders (
   -- email goes out exactly once even though both the Razorpay /verify call
   -- and the webhook can mark an order paid.
   confirmation_email_sent_at timestamptz,
+  -- coupon applied at order creation, if any (see coupons/coupon_redemptions
+  -- below); total_amount above is already the post-discount amount charged.
+  coupon_code         text,
+  discount_amount     numeric(12,2) not null default 0,
   shipping_name       text,
   shipping_phone      text,
   shipping_address    text,
@@ -298,6 +302,53 @@ create view public.product_rating_summary as
     count(*)::int as review_count
   from public.reviews
   group by product_id;
+
+-- ============================================================================
+-- COUPONS
+-- Percent-off discount codes, redeemable up to max_uses_per_user times per
+-- customer (a one-time "welcome" code is the default use case). Coupons
+-- themselves are publicly readable (so the checkout UI can look one up),
+-- but every write (creating coupons, recording a redemption) happens
+-- server-side via the service-role client — customers have no write policy
+-- on either table, so they can never grant themselves a discount or fake a
+-- redemption record.
+-- ============================================================================
+create table public.coupons (
+  id                uuid primary key default gen_random_uuid(),
+  code              text not null unique,
+  discount_percent  numeric(5,2) not null check (discount_percent > 0 and discount_percent <= 100),
+  is_active         boolean not null default true,
+  max_uses_per_user integer not null default 1,
+  created_at        timestamptz not null default now()
+);
+
+alter table public.coupons enable row level security;
+
+create policy "coupons_select_active"
+  on public.coupons for select
+  using (is_active);
+
+-- One row per (coupon, user) redemption — the unique constraint is what
+-- actually enforces "one welcome bonus per customer" at the database level.
+create table public.coupon_redemptions (
+  id         uuid primary key default gen_random_uuid(),
+  coupon_id  uuid not null references public.coupons(id) on delete cascade,
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  order_id   uuid references public.orders(id) on delete set null,
+  created_at timestamptz not null default now(),
+  unique (coupon_id, user_id)
+);
+
+alter table public.coupon_redemptions enable row level security;
+
+create policy "coupon_redemptions_select_own"
+  on public.coupon_redemptions for select
+  using (auth.uid() = user_id);
+
+-- Seed a 10%-off, one-time-per-customer welcome coupon.
+insert into public.coupons (code, discount_percent, is_active, max_uses_per_user)
+values ('WELCOME10', 10, true, 1)
+on conflict (code) do nothing;
 
 -- ============================================================================
 -- TRIGGERS

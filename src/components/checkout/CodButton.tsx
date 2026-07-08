@@ -7,9 +7,11 @@ import type { ShippingInfo } from "./RazorpayButton";
 
 export function CodButton({
   shippingInfo,
+  couponCode,
   disabled = false,
 }: {
   shippingInfo: ShippingInfo;
+  couponCode?: string;
   disabled?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
@@ -28,6 +30,7 @@ export function CodButton({
           shippingName: shippingInfo.name,
           shippingPhone: shippingInfo.phone,
           shippingAddress: shippingInfo.address,
+          couponCode,
         }),
       });
       const data = await res.json();

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { recordCouponRedemptionIfAny } from "@/lib/coupons";
 
 // Verifies the Razorpay checkout signature server-side before ever marking
 // an order as paid. The client-side "success" callback alone is never
@@ -63,6 +64,9 @@ export async function POST(request: Request) {
 
   // Confirmation email (sent exactly once — see sendOrderConfirmationEmail).
   await sendOrderConfirmationEmail(localOrderId);
+
+  // Only now that payment is confirmed does the coupon actually get "used".
+  await recordCouponRedemptionIfAny(admin, localOrderId);
 
   return NextResponse.json({ ok: true });
 }

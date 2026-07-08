@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cart/cart-context";
 import { formatINR } from "@/lib/format";
 import { RazorpayButton } from "@/components/checkout/RazorpayButton";
 import { CodButton } from "@/components/checkout/CodButton";
+import { CouponInput, type AppliedCoupon } from "@/components/checkout/CouponInput";
 import { AddressBook, type Address } from "@/components/account/AddressBook";
 import { BackButton } from "@/components/ui/BackButton";
 import type { PaymentMethod } from "@/lib/types";
@@ -16,6 +17,7 @@ export default function CheckoutPage() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [selected, setSelected] = useState<Address | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [profilePrefill, setProfilePrefill] = useState<{ full_name?: string; phone?: string }>({});
   const router = useRouter();
 
@@ -95,11 +97,33 @@ export default function CheckoutPage() {
             </li>
           ))}
         </ul>
-        <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
-          <span className="font-semibold text-slate-900">Total</span>
-          <span className="text-lg font-semibold text-slate-900">
-            {formatINR(subtotal)}
-          </span>
+        <div className="mt-4 border-t border-slate-100 pt-4">
+          <CouponInput
+            applied={appliedCoupon}
+            onApplied={setAppliedCoupon}
+            onRemoved={() => setAppliedCoupon(null)}
+          />
+        </div>
+
+        <div className="mt-4 space-y-1.5 border-t border-slate-100 pt-4">
+          {appliedCoupon && (
+            <>
+              <div className="flex items-center justify-between text-sm text-slate-500">
+                <span>Subtotal</span>
+                <span>{formatINR(subtotal)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm text-green-700">
+                <span>Discount ({appliedCoupon.code})</span>
+                <span>&minus;{formatINR(appliedCoupon.discountAmount)}</span>
+              </div>
+            </>
+          )}
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-slate-900">Total</span>
+            <span className="text-lg font-semibold text-slate-900">
+              {formatINR(appliedCoupon ? appliedCoupon.total : subtotal)}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -179,6 +203,7 @@ export default function CheckoutPage() {
               phone: selected?.phone ?? "",
               address: selected?.address_line ?? "",
             }}
+            couponCode={appliedCoupon?.code}
             disabled={!shippingComplete}
           />
         ) : (
@@ -188,6 +213,7 @@ export default function CheckoutPage() {
               phone: selected?.phone ?? "",
               address: selected?.address_line ?? "",
             }}
+            couponCode={appliedCoupon?.code}
             disabled={!shippingComplete}
           />
         )}
