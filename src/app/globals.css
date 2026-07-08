@@ -14,6 +14,14 @@
   --color-brand-600: #2563eb;
   --color-brand-700: #1d4ed8;
   --color-brand-900: #102a63;
+
+  /* Indigo scale — used only by the deep-ocean themed section, kept
+     separate from the brand-* blue scale used everywhere else. */
+  --color-indigo-400: #818cf8;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+  --color-indigo-900: #1e1b6e;
 }
 
 @theme inline {
@@ -28,6 +36,11 @@
   --color-brand-600: var(--color-brand-600);
   --color-brand-700: var(--color-brand-700);
   --color-brand-900: var(--color-brand-900);
+  --color-indigo-400: var(--color-indigo-400);
+  --color-indigo-500: var(--color-indigo-500);
+  --color-indigo-600: var(--color-indigo-600);
+  --color-indigo-700: var(--color-indigo-700);
+  --color-indigo-900: var(--color-indigo-900);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -123,6 +136,35 @@ body {
   animation: shimmer-drift 9s ease-in-out infinite;
 }
 
+/* Deep-ocean section decoration: fish drifting sideways with a slight
+   bob, and seaweed swaying from its base like a current is passing. */
+@keyframes fish-swim {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(18px, -6px);
+  }
+}
+.animate-fish {
+  animation: fish-swim 6s ease-in-out infinite;
+}
+
+@keyframes seaweed-sway {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+.animate-seaweed {
+  animation: seaweed-sway 4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-bubble,
   .animate-float,
@@ -130,7 +172,9 @@ body {
   .animate-wave-slow,
   .animate-wave-med,
   .animate-wave-fast,
-  .animate-shimmer {
+  .animate-shimmer,
+  .animate-fish,
+  .animate-seaweed {
     animation: none;
   }
 }

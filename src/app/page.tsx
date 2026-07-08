@@ -7,6 +7,7 @@ import { CategoryButtons } from "@/components/home/CategoryButtons";
 import { ProductShowcase } from "@/components/home/ProductShowcase";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
+import { OceanSection } from "@/components/home/OceanSection";
 import { CtaBanner } from "@/components/home/CtaBanner";
 import { CategorySection } from "@/components/product/CategorySection";
 
@@ -84,6 +85,7 @@ export default async function HomePage() {
         ratings={ratings}
       />
       <WhyChooseUs />
+      <OceanSection />
       <CtaBanner />
     </>
   );
