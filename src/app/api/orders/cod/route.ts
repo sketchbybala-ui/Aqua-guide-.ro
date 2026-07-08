@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 // Places a Cash-on-Delivery order. Same authoritative-total logic as the
 // Razorpay create-order route (the amount is always recomputed here from
@@ -85,6 +86,9 @@ export async function POST(request: Request) {
 
   // Clear the cart with the user's own session (RLS: cart_items_delete_own).
   await supabase.from("cart_items").delete().eq("user_id", user.id);
+
+  // "Order received, pay on delivery" confirmation email.
+  await sendOrderConfirmationEmail(order.id);
 
   return NextResponse.json({ localOrderId: order.id });
 }

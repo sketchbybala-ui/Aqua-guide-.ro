@@ -146,6 +146,10 @@ create table public.orders (
   -- set when the customer requests a refund; the admin then approves it,
   -- which issues the actual Razorpay refund and sets refunded_at.
   refund_requested_at timestamptz,
+  -- claimed atomically before sending the order confirmation email, so the
+  -- email goes out exactly once even though both the Razorpay /verify call
+  -- and the webhook can mark an order paid.
+  confirmation_email_sent_at timestamptz,
   shipping_name       text,
   shipping_phone      text,
   shipping_address    text,

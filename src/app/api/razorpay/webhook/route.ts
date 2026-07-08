@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 // Razorpay calls this directly (no user session) whenever a payment's
 // status changes. This is the authoritative source of truth for order
@@ -42,6 +43,15 @@ export async function POST(request: Request) {
       })
       .eq("razorpay_order_id", razorpayOrderId)
       .neq("status", "paid"); // idempotent: no-op if /verify already marked it paid
+
+    // Confirmation email — the atomic claim inside makes this a no-op if the
+    // /verify path already sent it, so this is just the backstop.
+    const { data: order } = await admin
+      .from("orders")
+      .select("id")
+      .eq("razorpay_order_id", razorpayOrderId)
+      .maybeSingle();
+    if (order) await sendOrderConfirmationEmail(order.id);
   } else if (event.event === "payment.failed" && razorpayOrderId) {
     await admin
       .from("orders")
