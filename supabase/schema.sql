@@ -328,6 +328,11 @@ create policy "coupons_select_active"
   on public.coupons for select
   using (is_active);
 
+create policy "coupons_admin_write"
+  on public.coupons for all
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin))
+  with check (exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin));
+
 -- One row per (coupon, user) redemption — the unique constraint is what
 -- actually enforces "one welcome bonus per customer" at the database level.
 create table public.coupon_redemptions (
@@ -345,10 +350,37 @@ create policy "coupon_redemptions_select_own"
   on public.coupon_redemptions for select
   using (auth.uid() = user_id);
 
+create policy "coupon_redemptions_admin_select_all"
+  on public.coupon_redemptions for select
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin));
+
 -- Seed a 10%-off, one-time-per-customer welcome coupon.
 insert into public.coupons (code, discount_percent, is_active, max_uses_per_user)
 values ('WELCOME10', 10, true, 1)
 on conflict (code) do nothing;
+
+-- ============================================================================
+-- PAGE_VIEWS
+-- Lightweight visit log — one row per page load, written by a client-side
+-- beacon via a service-role API route (no client insert policy needed, or
+-- possible, since customers never write here directly). Only admins can
+-- read it.
+-- ============================================================================
+create table public.page_views (
+  id         uuid primary key default gen_random_uuid(),
+  path       text not null,
+  user_id    uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now()
+);
+
+create index page_views_created_at_idx on public.page_views(created_at);
+create index page_views_path_idx on public.page_views(path);
+
+alter table public.page_views enable row level security;
+
+create policy "page_views_admin_select_all"
+  on public.page_views for select
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin));
 
 -- ============================================================================
 -- TRIGGERS

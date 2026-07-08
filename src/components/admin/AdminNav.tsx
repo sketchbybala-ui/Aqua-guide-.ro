@@ -6,13 +6,19 @@ import { usePathname } from "next/navigation";
 const TABS = [
   { href: "/admin", label: "Products" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/reviews", label: "Reviews" },
+  { href: "/admin/coupons", label: "Promo Codes" },
+  { href: "/admin/users", label: "Users" },
+  { href: "/admin/catalog", label: "Catalog Settings" },
+  { href: "/admin/storage", label: "Storage" },
+  { href: "/admin/visitors", label: "Visitors" },
 ];
 
 export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex gap-1 border-b border-slate-100">
+    <nav className="flex flex-wrap gap-1 border-b border-slate-100">
       {TABS.map((tab) => {
         const active =
           tab.href === "/admin" ? pathname === "/admin" : pathname.startsWith(tab.href);

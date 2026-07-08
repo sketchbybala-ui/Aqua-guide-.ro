@@ -5,6 +5,7 @@ import { CartProvider } from "@/lib/cart/cart-context";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { VisitorTracker } from "@/components/layout/VisitorTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-white text-slate-900">
         <CartProvider>
+          <VisitorTracker />
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
