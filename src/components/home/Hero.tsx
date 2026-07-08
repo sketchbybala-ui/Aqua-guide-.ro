@@ -1,18 +1,6 @@
 import Image from "next/image";
-import { LinkButton } from "@/components/ui/Button";
 import { Bubbles } from "./Bubbles";
 import { AnimatedWaves } from "./AnimatedWaves";
-
-const WHATSAPP_DEMO_LINK =
-  "https://wa.me/919489368104?text=" +
-  encodeURIComponent("Hi Aqua Guide, I'd like to request a demo.");
-
-const features = [
-  { label: "100% Pure Water", icon: DropIcon },
-  { label: "Advanced RO Technology", icon: FilterIcon },
-  { label: "Healthy & Safe", icon: HeartIcon },
-  { label: "Easy Installation", icon: WrenchIcon },
-];
 
 const specBadges = [
   { label: "Multi Stage Purification", icon: LayersIcon },
@@ -50,27 +38,6 @@ export function Hero({ heroImageUrl }: { heroImageUrl: string | null }) {
             100% pure, safe and healthy drinking water for your family and
             business.
           </p>
-
-          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
-            {features.map(({ label, icon: Icon }) => (
-              <div
-                key={label}
-                className="flex items-center gap-2 rounded-full bg-white py-1.5 pl-1.5 pr-3.5 text-xs font-medium text-slate-700 shadow-sm"
-              >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600">
-                  <Icon />
-                </span>
-                {label}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <LinkButton href="/home-use">Explore Products &rarr;</LinkButton>
-            <LinkButton href={WHATSAPP_DEMO_LINK} variant="secondary">
-              Request a Demo &rarr;
-            </LinkButton>
-          </div>
         </div>
 
         <div className="relative mx-auto w-full max-w-sm lg:max-w-none">
@@ -113,57 +80,6 @@ export function Hero({ heroImageUrl }: { heroImageUrl: string | null }) {
         <AnimatedWaves color="#102a63" height={100} />
       </div>
     </section>
-  );
-}
-
-function DropIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 2.5c3.5 4.2 6.5 8.1 6.5 11.6a6.5 6.5 0 1 1-13 0c0-3.5 3-7.4 6.5-11.6Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
-function FilterIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M4 4h16l-6 8v6l-4 2v-8L4 4Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function HeartIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 20s-7-4.4-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 5c-2.5 4.6-9.5 9-9.5 9Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function WrenchIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M14.7 6.3a4 4 0 0 0-5.4 5l-6 6 2 2 6-6a4 4 0 0 0 5-5.4l-2.6 2.6-2-2 2.6-2.6Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
 
