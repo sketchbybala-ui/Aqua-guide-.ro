@@ -3,6 +3,7 @@ import { getActiveProductsByCategory } from "@/lib/products";
 import { getRatingSummaries } from "@/lib/reviews";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { BackButton } from "@/components/ui/BackButton";
+import { AquaticBackdrop } from "@/components/layout/AquaticBackdrop";
 
 export const metadata: Metadata = {
   title: "Home Use Water Purifiers | Aqua Guide",
@@ -16,15 +17,18 @@ export default async function HomeUsePage() {
   const ratings = await getRatingSummaries(products.map((p) => p.id));
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <BackButton fallbackHref="/" />
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-slate-900">Home Use</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Compact RO purifiers designed for kitchens and apartments.
-        </p>
+    <section className="relative overflow-hidden bg-gradient-to-b from-brand-50/70 via-white to-white">
+      <AquaticBackdrop />
+      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6">
+        <BackButton fallbackHref="/" />
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-slate-900">Home Use</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Compact RO purifiers designed for kitchens and apartments.
+          </p>
+        </div>
+        <ProductGrid products={products} categoryLabel="Home Use" ratings={ratings} />
       </div>
-      <ProductGrid products={products} categoryLabel="Home Use" ratings={ratings} />
     </section>
   );
 }

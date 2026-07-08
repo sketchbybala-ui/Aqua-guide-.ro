@@ -23,7 +23,7 @@ export function ProductCard({
   const { addItem } = useCart();
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white transition-shadow hover:shadow-md">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-100">
       <Link href={`/products/${product.slug}`}>
         <div className="relative aspect-square w-full bg-slate-50">
           {product.image_url && (

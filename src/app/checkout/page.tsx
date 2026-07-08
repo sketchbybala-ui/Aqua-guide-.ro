@@ -10,6 +10,7 @@ import { CodButton } from "@/components/checkout/CodButton";
 import { CouponInput, type AppliedCoupon } from "@/components/checkout/CouponInput";
 import { AddressBook, type Address } from "@/components/account/AddressBook";
 import { BackButton } from "@/components/ui/BackButton";
+import { AquaticBackdrop } from "@/components/layout/AquaticBackdrop";
 import type { PaymentMethod } from "@/lib/types";
 
 export default function CheckoutPage() {
@@ -62,11 +63,13 @@ export default function CheckoutPage() {
   const shippingComplete = Boolean(selected);
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+    <section className="relative overflow-hidden bg-gradient-to-b from-brand-50/70 via-white to-white">
+      <AquaticBackdrop />
+      <div className="relative mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <BackButton fallbackHref="/cart" />
       <h1 className="mb-8 text-2xl font-semibold text-slate-900">Checkout</h1>
 
-      <div className="rounded-2xl border border-slate-100 p-6">
+      <div className="rounded-2xl border border-slate-100 bg-white p-6">
         <h2 className="mb-4 text-sm font-semibold text-slate-700">
           Shipping Address
         </h2>
@@ -78,7 +81,7 @@ export default function CheckoutPage() {
         />
       </div>
 
-      <div className="mt-6 rounded-2xl border border-slate-100 p-6">
+      <div className="mt-6 rounded-2xl border border-slate-100 bg-white p-6">
         <h2 className="mb-4 text-sm font-semibold text-slate-700">
           Order Summary
         </h2>
@@ -127,7 +130,7 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-slate-100 p-6">
+      <div className="mt-6 rounded-2xl border border-slate-100 bg-white p-6">
         <h2 className="mb-4 text-sm font-semibold text-slate-700">
           Payment Method
         </h2>
@@ -217,6 +220,7 @@ export default function CheckoutPage() {
             disabled={!shippingComplete}
           />
         )}
+      </div>
       </div>
     </section>
   );

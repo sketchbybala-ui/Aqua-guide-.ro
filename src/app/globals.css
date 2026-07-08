@@ -165,6 +165,40 @@ body {
   transform-origin: bottom center;
 }
 
+/* Card/section entrance: fades and rises into place once on mount —
+   used for product grids and page headers so pages feel less static. */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Icon/card hover: a small playful wobble, e.g. on the "Why Choose Us"
+   icons. */
+@keyframes wobble {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-6deg) scale(1.08);
+  }
+  75% {
+    transform: rotate(6deg) scale(1.08);
+  }
+}
+.hover\:animate-wobble:hover {
+  animation: wobble 0.5s ease-in-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-bubble,
   .animate-float,
@@ -174,7 +208,9 @@ body {
   .animate-wave-fast,
   .animate-shimmer,
   .animate-fish,
-  .animate-seaweed {
+  .animate-seaweed,
+  .animate-fade-in-up,
+  .hover\:animate-wobble:hover {
     animation: none;
   }
 }
