@@ -72,7 +72,7 @@ export function SignupForm() {
         return;
       }
 
-      router.push("/");
+      router.push("/?welcome=1");
       router.refresh();
     } catch {
       setError(

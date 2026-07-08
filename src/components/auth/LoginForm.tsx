@@ -70,7 +70,8 @@ export function LoginForm() {
       }
 
       const next = searchParams.get("next") ?? "/";
-      router.push(next);
+      const separator = next.includes("?") ? "&" : "?";
+      router.push(`${next}${separator}welcome=1`);
       router.refresh();
     } catch {
       setError(

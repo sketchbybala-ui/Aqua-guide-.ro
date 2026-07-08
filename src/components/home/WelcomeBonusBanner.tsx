@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { WelcomeBonusModalClient } from "./WelcomeBonusModalClient";
 
-// Shown to any logged-in customer who hasn't yet redeemed the welcome
-// coupon — renders nothing for guests or once it's been used. This is a
-// server component so the check happens before any HTML is sent (no
-// client-side flash of the banner for users who've already redeemed it).
+// Eligibility check (logged in + hasn't redeemed WELCOME10) happens here,
+// server-side, so ineligible visitors never even receive the popup's
+// markup. The actual popup only appears right after a login/signup
+// redirect (see WelcomeBonusModalClient) — not on every ordinary visit.
 export async function WelcomeBonusBanner() {
   const supabase = await createClient();
   const {
@@ -30,16 +32,8 @@ export async function WelcomeBonusBanner() {
   if ((count ?? 0) > 0) return null;
 
   return (
-    <div className="bg-brand-600">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-4 py-2.5 text-center text-sm text-white sm:px-6">
-        <span>
-          🎉 Welcome! Use code{" "}
-          <span className="rounded bg-white/20 px-1.5 py-0.5 font-mono font-semibold">
-            {coupon.code}
-          </span>{" "}
-          at checkout for {coupon.discount_percent}% off your order.
-        </span>
-      </div>
-    </div>
+    <Suspense>
+      <WelcomeBonusModalClient code={coupon.code} discountPercent={coupon.discount_percent} />
+    </Suspense>
   );
 }
