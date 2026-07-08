@@ -86,6 +86,43 @@ export function Coral({
   );
 }
 
+// Note: like Fish, `flip` lives on this inner <svg> so a translate
+// animation on the caller's positioned wrapper never collides with it.
+export function Whale({
+  className = "",
+  color = "#818cf8",
+  flip = false,
+}: {
+  className?: string;
+  color?: string;
+  flip?: boolean;
+}) {
+  return (
+    <svg
+      viewBox="0 0 80 46"
+      className={className}
+      style={flip ? { transform: "scaleX(-1)" } : undefined}
+      aria-hidden="true"
+    >
+      {/* tail flukes, at the back (left) */}
+      <path d="M14 26 L0 10 L8 24 Z" fill={color} />
+      <path d="M14 26 L0 42 L8 28 Z" fill={color} />
+      {/* rounded body */}
+      <ellipse cx="42" cy="26" rx="28" ry="15" fill={color} />
+      {/* dorsal fin */}
+      <path d="M39 12 L45 1 L49 13 Z" fill={color} />
+      {/* water spout, from the head (right) */}
+      <g stroke={color} strokeWidth="2.4" strokeLinecap="round" opacity="0.8">
+        <path d="M62 9 V2" />
+        <path d="M58 8 L55 3" />
+        <path d="M66 8 L69 3" />
+      </g>
+      {/* eye */}
+      <circle cx="60" cy="24" r="1.8" fill="#0f1044" />
+    </svg>
+  );
+}
+
 export function Starfish({
   className = "",
   color = "#fbbf24",

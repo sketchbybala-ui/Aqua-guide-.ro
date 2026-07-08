@@ -151,6 +151,20 @@ body {
   animation: fish-swim 6s ease-in-out infinite;
 }
 
+/* Whale: a slower, wider glide than the fish — big, majestic, unhurried. */
+@keyframes whale-swim {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(36px, -14px);
+  }
+}
+.animate-whale {
+  animation: whale-swim 11s ease-in-out infinite;
+}
+
 @keyframes seaweed-sway {
   0%,
   100% {
@@ -208,6 +222,7 @@ body {
   .animate-wave-fast,
   .animate-shimmer,
   .animate-fish,
+  .animate-whale,
   .animate-seaweed,
   .animate-fade-in-up,
   .hover\:animate-wobble:hover {

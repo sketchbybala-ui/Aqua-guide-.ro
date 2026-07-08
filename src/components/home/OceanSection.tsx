@@ -1,6 +1,6 @@
 import { AnimatedWaves } from "./AnimatedWaves";
 import { Bubbles } from "./Bubbles";
-import { Fish, Seaweed, Coral, Starfish } from "./SeaLife";
+import { Fish, Seaweed, Coral, Starfish, Whale } from "./SeaLife";
 
 const highlights = [
   { title: "Sourced Responsibly", text: "Every purifier is built to protect the water we all share." },
@@ -19,6 +19,14 @@ export function OceanSection() {
       <div className="relative py-16">
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
           <Bubbles tone="onBlue" />
+
+          {/* Whale's swim (translate) animation lives on this wrapper, same
+              reasoning as the fish below — keeps it separate from Whale's
+              own flip (scaleX) transform on its inner <svg>. Large and
+              faint, drifting slowly behind everything else. */}
+          <div className="animate-whale absolute left-[2%] top-[8%] h-16 w-28 opacity-40 sm:h-20 sm:w-36">
+            <Whale className="h-full w-full" color="#a5b4fc" />
+          </div>
 
           {/* Each fish's swim (translate) animation lives on this wrapper,
               separate from Fish's own flip (scaleX) transform on its inner
