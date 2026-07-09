@@ -165,6 +165,22 @@ body {
   animation: whale-swim 11s ease-in-out infinite;
 }
 
+/* Tail flukes flap independently of the whale's overall drift — a quick
+   downstroke, slower recovery, like real propulsion rather than a
+   metronome. */
+@keyframes tail-flap {
+  0%,
+  100% {
+    transform: rotate(-10deg);
+  }
+  40% {
+    transform: rotate(14deg);
+  }
+}
+.animate-tail-flap {
+  animation: tail-flap 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
 @keyframes seaweed-sway {
   0%,
   100% {

@@ -22,10 +22,10 @@ export function OceanSection() {
 
           {/* Whale's swim (translate) animation lives on this wrapper, same
               reasoning as the fish below — keeps it separate from Whale's
-              own flip (scaleX) transform on its inner <svg>. Large and
-              faint, drifting slowly behind everything else. */}
-          <div className="animate-whale absolute left-[2%] top-[8%] h-16 w-28 opacity-40 sm:h-20 sm:w-36">
-            <Whale className="h-full w-full" color="#a5b4fc" />
+              own flip (scaleX) transform on its inner <svg>. Large enough
+              to be the section's centerpiece, not just background noise. */}
+          <div className="animate-whale absolute left-[2%] top-[3%] h-14 w-24 opacity-90 drop-shadow-lg sm:left-[3%] sm:top-[6%] sm:h-24 sm:w-44 md:left-[6%] md:top-[10%] md:h-32 md:w-60">
+            <Whale className="h-full w-full" />
           </div>
 
           {/* Each fish's swim (translate) animation lives on this wrapper,
