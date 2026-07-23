@@ -22,12 +22,15 @@ export const dynamic = "force-dynamic";
 // mix across both categories (all with clean cutout photos).
 const SHOWCASE_SLUGS = ["vista-pro", "ss-aqua-ro-mobile-unit", "aqua-touch"];
 
-// A trimmed, transparent (no baked-in white canvas or caption text) cutout
-// of the AquaGrand RO+UV unit — see scripts/upload-hero-image.mjs. The
-// regular catalog photos have a white canvas + spec caption baked in
-// (fine for product cards), which looks wrong blown up large in the hero.
+// A tightly-trimmed, clean studio shot of the KNL Healthy Drops unit (pure
+// white background, no baked-in caption text) — replaces the old AquaGrand
+// cutout, which looked cluttered (visible tubing/wiring, small print) at
+// hero scale. ML background removal failed on this photo (its white base
+// blended into the white backdrop and got erased), so this is a plain
+// trimmed JPEG rather than a transparent PNG — its white background blends
+// into the podium's own white background anyway.
 const HERO_IMAGE_URL =
-  "https://xdyouevsulbaiuwuumpi.supabase.co/storage/v1/object/public/product-images/products/hero/aquagrand-ro-uv-transparent.png";
+  "https://xdyouevsulbaiuwuumpi.supabase.co/storage/v1/object/public/product-images/products/hero/knl-healthy-drops-hero.jpg";
 
 export default async function HomePage() {
   const supabase = await createClient();

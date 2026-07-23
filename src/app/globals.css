@@ -136,6 +136,40 @@ body {
   animation: shimmer-drift 9s ease-in-out infinite;
 }
 
+/* Water splash behind the hero product: rings expand outward and fade,
+   like ripples spreading from a drop hitting water. */
+@keyframes ripple-expand {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+.animate-ripple {
+  animation: ripple-expand 3.2s ease-out infinite;
+}
+
+/* Small splash droplets flicking outward and settling back. */
+@keyframes splash-flick {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: var(--splash-end, translate(20px, -30px)) scale(1);
+    opacity: 0;
+  }
+}
+.animate-splash {
+  animation: splash-flick 2.6s ease-out infinite;
+}
+
 /* Deep-ocean section decoration: fish drifting sideways with a slight
    bob, and seaweed swaying from its base like a current is passing. */
 @keyframes fish-swim {
@@ -275,6 +309,8 @@ body {
   .animate-fade-in-up,
   .animate-pop-in,
   .animate-draw-check,
+  .animate-ripple,
+  .animate-splash,
   .hover\:animate-wobble:hover {
     animation: none;
   }

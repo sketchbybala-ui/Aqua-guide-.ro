@@ -42,6 +42,32 @@ export function Hero({ heroImageUrl }: { heroImageUrl: string | null }) {
 
         <div className="relative mx-auto w-full max-w-sm lg:max-w-none">
           <div className="absolute inset-x-6 bottom-4 top-10 -z-10 rounded-full bg-brand-200/60 blur-2xl" />
+
+          {/* water splash: expanding ripple rings + flicking droplets,
+              centered behind the product podium */}
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
+            <span className="animate-ripple absolute h-[85%] w-[85%] rounded-full border-2 border-brand-300/70" />
+            <span className="animate-ripple absolute h-[85%] w-[85%] rounded-full border-2 border-brand-300/70" style={{ animationDelay: "1s" }} />
+            <span className="animate-ripple absolute h-[85%] w-[85%] rounded-full border-2 border-brand-300/70" style={{ animationDelay: "2s" }} />
+
+            {[
+              { top: "10%", left: "12%", end: "translate(-18px, -22px)", delay: "0s" },
+              { top: "8%", left: "82%", end: "translate(22px, -20px)", delay: "0.6s" },
+              { top: "78%", left: "88%", end: "translate(24px, 18px)", delay: "1.3s" },
+              { top: "85%", left: "16%", end: "translate(-20px, 20px)", delay: "1.9s" },
+            ].map((d, i) => (
+              <svg
+                key={i}
+                className="animate-splash absolute h-3 w-3 text-brand-400"
+                style={{ top: d.top, left: d.left, ["--splash-end" as string]: d.end, animationDelay: d.delay }}
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 2.5c3.5 4.2 6.5 8.1 6.5 11.6a6.5 6.5 0 1 1-13 0c0-3.5 3-7.4 6.5-11.6Z" />
+              </svg>
+            ))}
+          </div>
+
           <div className="relative mx-auto flex aspect-square w-full max-w-[340px] items-center justify-center rounded-full bg-white/70 shadow-inner">
             {heroImageUrl && (
               <div className="relative h-[85%] w-[85%]">
