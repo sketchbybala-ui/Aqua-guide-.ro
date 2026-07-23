@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart/cart-context";
 import { Header } from "@/components/layout/Header";
@@ -17,6 +17,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// A distinctive display serif for headings — sets them apart from the
+// plain sans-serif body text, and echoes the logo wordmark's serif.
+const fraunces = Fraunces({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  weight: ["600", "700", "900"],
+});
+
 export const metadata: Metadata = {
   title: "Aqua Guide | Water Purifiers for Home & Business",
   description:
@@ -31,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-white text-slate-900">
         <CartProvider>

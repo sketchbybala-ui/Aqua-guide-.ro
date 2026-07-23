@@ -23,7 +23,7 @@ export default async function AccountPage() {
       <div className="relative mx-auto max-w-2xl px-4 py-12 sm:px-6">
         <BackButton fallbackHref="/" />
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-slate-900">My Account</h1>
+          <h1 className="font-heading text-2xl font-semibold text-slate-900">My Account</h1>
           <LogoutButton />
         </div>
 

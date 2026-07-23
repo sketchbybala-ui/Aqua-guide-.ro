@@ -67,7 +67,7 @@ export default function CheckoutPage() {
       <AquaticBackdrop />
       <div className="relative mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <BackButton fallbackHref="/cart" />
-      <h1 className="mb-8 text-2xl font-semibold text-slate-900">Checkout</h1>
+      <h1 className="font-heading mb-8 text-2xl font-semibold text-slate-900">Checkout</h1>
 
       <div className="rounded-2xl border border-slate-100 bg-white p-6">
         <h2 className="mb-4 text-sm font-semibold text-slate-700">

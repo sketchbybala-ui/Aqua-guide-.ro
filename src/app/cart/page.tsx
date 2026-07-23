@@ -15,7 +15,7 @@ export default function CartPage() {
       <AquaticBackdrop />
       <div className="relative mx-auto max-w-4xl px-4 py-12 sm:px-6">
         <BackButton fallbackHref="/" />
-        <h1 className="mb-8 text-2xl font-semibold text-slate-900">
+        <h1 className="font-heading mb-8 text-2xl font-semibold text-slate-900">
           Your Cart
         </h1>
 

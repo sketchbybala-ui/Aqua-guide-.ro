@@ -30,9 +30,15 @@ export function WhyChooseUs() {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <h2 className="text-center text-2xl font-semibold text-slate-900 sm:text-3xl">
-          The Best Water Purifier Brand You Can Trust
-        </h2>
+        <div className="relative text-center">
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-28 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-100/70 blur-3xl"
+            aria-hidden="true"
+          />
+          <h2 className="font-heading text-2xl font-semibold text-slate-900 sm:text-3xl">
+            The Best Water Purifier Brand You Can Trust
+          </h2>
+        </div>
 
         <div className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
           {items.map(({ title, description, icon: Icon }) => (

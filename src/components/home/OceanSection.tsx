@@ -59,7 +59,7 @@ export function OceanSection() {
           <span className="text-xs font-semibold uppercase tracking-widest text-indigo-200">
             Our Promise
           </span>
-          <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
+          <h2 className="font-heading mt-2 text-2xl font-bold text-white sm:text-3xl">
             Every Drop Starts in the Deep
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-indigo-100">

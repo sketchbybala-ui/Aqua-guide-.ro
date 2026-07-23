@@ -3,6 +3,7 @@ import { getActiveProductsByCategory } from "@/lib/products";
 import { getRatingSummaries } from "@/lib/reviews";
 import { Hero } from "@/components/home/Hero";
 import { WelcomeBonusBanner } from "@/components/home/WelcomeBonusBanner";
+import { OffersSection } from "@/components/home/OffersSection";
 import { StatsBar } from "@/components/home/StatsBar";
 import { CategoryButtons } from "@/components/home/CategoryButtons";
 import { ProductShowcase } from "@/components/home/ProductShowcase";
@@ -72,6 +73,9 @@ export default async function HomePage() {
       <Hero heroImageUrl={HERO_IMAGE_URL} />
       <StatsBar />
       <CategoryButtons />
+      <div className="py-6">
+        <OffersSection />
+      </div>
       <ProductShowcase products={showcase} />
       <FeaturedProducts products={featured ?? []} ratings={ratings} />
       <CategorySection

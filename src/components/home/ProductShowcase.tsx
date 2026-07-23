@@ -20,8 +20,12 @@ export function ProductShowcase({ products }: { products: ShowcaseProduct[] }) {
           </span>
         </div>
 
-        <div className="mx-auto mb-12 max-w-xl text-center">
-          <h2 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+        <div className="relative mx-auto mb-12 max-w-xl text-center">
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-28 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-100/70 blur-3xl"
+            aria-hidden="true"
+          />
+          <h2 className="font-heading text-2xl font-semibold text-slate-900 sm:text-3xl">
             RO Purifiers Built to Last
           </h2>
           <p className="mt-2 text-sm text-slate-500">

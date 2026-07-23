@@ -21,8 +21,12 @@ export function CategorySection({
     <section className={tone === "tint" ? "bg-brand-50" : "bg-white"}>
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="mb-8 flex items-end justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900">{title}</h2>
+          <div className="relative">
+            <div
+              className="pointer-events-none absolute -left-4 top-0 -z-10 h-16 w-48 rounded-full bg-brand-100/70 blur-2xl"
+              aria-hidden="true"
+            />
+            <h2 className="font-heading text-2xl font-semibold text-slate-900">{title}</h2>
             {description && (
               <p className="mt-1 text-sm text-slate-500">{description}</p>
             )}

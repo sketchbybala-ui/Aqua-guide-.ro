@@ -16,7 +16,7 @@ export function CtaBanner() {
         <Bubbles tone="onBlue" />
 
         <div className="relative flex flex-col items-start gap-5">
-          <h2 className="max-w-lg text-2xl font-bold text-white sm:text-3xl">
+          <h2 className="font-heading max-w-lg text-2xl font-bold text-white sm:text-3xl">
             Ready to Experience Pure Water?
           </h2>
           <p className="max-w-md text-sm text-blue-100">

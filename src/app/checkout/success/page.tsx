@@ -36,7 +36,7 @@ export default async function CheckoutSuccessPage({
         {confirmed ? (
           <>
             <SuccessCheck />
-            <h1 className="mt-5 text-2xl font-semibold text-slate-900">
+            <h1 className="font-heading mt-5 text-2xl font-semibold text-slate-900">
               Thank you for your order!
             </h1>
             <p className="mt-2 text-sm text-slate-500">
@@ -96,7 +96,7 @@ export default async function CheckoutSuccessPage({
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-semibold text-slate-900">
+            <h1 className="font-heading text-2xl font-semibold text-slate-900">
               We couldn&apos;t confirm this order
             </h1>
             <p className="mt-2 text-sm text-slate-500">

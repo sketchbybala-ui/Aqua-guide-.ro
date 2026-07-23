@@ -43,6 +43,7 @@
   --color-indigo-900: var(--color-indigo-900);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-heading);
 }
 
 body {

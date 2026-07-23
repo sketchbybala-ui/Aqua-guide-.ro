@@ -28,7 +28,7 @@ export function Hero({ heroImageUrl }: { heroImageUrl: string | null }) {
 
       <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 pb-24 pt-16 sm:px-6 lg:grid-cols-2">
         <div className="flex flex-col items-start gap-6">
-          <h1 className="max-w-xl text-4xl font-bold tracking-tight sm:text-5xl">
+          <h1 className="font-heading max-w-xl text-4xl font-bold tracking-tight sm:text-5xl">
             <span className="text-slate-900">Pure Water.</span>
             <br />
             <span className="text-brand-600">Better Life.</span>
